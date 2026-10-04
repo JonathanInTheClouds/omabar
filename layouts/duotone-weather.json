@@ -1,0 +1,171 @@
+{
+  "name": "Duotone Weather",
+  "description": "Duotone with live weather by the clock: condition icon and temperature, refreshed every 15 minutes. Tap it for the forecast. Mic mute is on Fn.",
+  "mediaLayerDefault": true,
+  "showButtonOutlines": false,
+  "adaptiveBrightness": true,
+  "fontTemplate": "JetBrainsMono Nerd Font:bold",
+  "buttons": [
+    {
+      "icon": "brightness_low",
+      "tint": "foreground",
+      "key": "BrightnessDown"
+    },
+    {
+      "icon": "brightness_high",
+      "tint": "foreground",
+      "key": "BrightnessUp"
+    },
+    {
+      "spacer": true,
+      "stretch": 1
+    },
+    {
+      "icon": "apps",
+      "tint": "accent",
+      "key": "Search",
+      "hyprKey": "XF86Search",
+      "command": "omarchy-menu toggle"
+    },
+    {
+      "icon": "terminal",
+      "tint": "accent",
+      "key": "F13",
+      "hyprKey": "code:191",
+      "command": "omarchy-launch-terminal"
+    },
+    {
+      "icon": "public",
+      "tint": "accent",
+      "key": "F14",
+      "hyprKey": "code:192",
+      "command": "omarchy-launch-browser"
+    },
+    {
+      "icon": "folder",
+      "tint": "accent",
+      "key": "F15",
+      "hyprKey": "code:193",
+      "command": "omarchy-launch-nautilus"
+    },
+    {
+      "spacer": true,
+      "stretch": 1
+    },
+    {
+      "icon": "fast_rewind",
+      "tint": "foreground",
+      "key": "PreviousSong"
+    },
+    {
+      "icon": "play_pause",
+      "tint": "foreground",
+      "key": "PlayPause"
+    },
+    {
+      "icon": "fast_forward",
+      "tint": "foreground",
+      "key": "NextSong"
+    },
+    {
+      "spacer": true,
+      "stretch": 1
+    },
+    {
+      "icon": "volume_off",
+      "tint": "foreground",
+      "key": "Mute"
+    },
+    {
+      "icon": "volume_down",
+      "tint": "foreground",
+      "key": "VolumeDown"
+    },
+    {
+      "icon": "volume_up",
+      "tint": "foreground",
+      "key": "VolumeUp"
+    },
+    {
+      "spacer": true,
+      "stretch": 1
+    },
+    {
+      "weather": "icon"
+    },
+    {
+      "weather": "temp"
+    },
+    {
+      "spacer": true,
+      "stretch": 1
+    },
+    {
+      "time": "%-I:%M %p",
+      "stretch": 2
+    },
+    {
+      "battery": "both",
+      "stretch": 2
+    }
+  ],
+  "fnLayer": [
+    {
+      "icon": "mic_off",
+      "tint": "foreground",
+      "key": "MicMute"
+    },
+    {
+      "spacer": true,
+      "stretch": 1
+    },
+    {
+      "text": "F1",
+      "key": "F1"
+    },
+    {
+      "text": "F2",
+      "key": "F2"
+    },
+    {
+      "text": "F3",
+      "key": "F3"
+    },
+    {
+      "text": "F4",
+      "key": "F4"
+    },
+    {
+      "text": "F5",
+      "key": "F5"
+    },
+    {
+      "text": "F6",
+      "key": "F6"
+    },
+    {
+      "text": "F7",
+      "key": "F7"
+    },
+    {
+      "text": "F8",
+      "key": "F8"
+    },
+    {
+      "text": "F9",
+      "key": "F9"
+    },
+    {
+      "text": "F10",
+      "key": "F10"
+    },
+    {
+      "text": "F11",
+      "key": "F11"
+    },
+    {
+      "text": "F12",
+      "key": "F12"
+    }
+  ]
+}

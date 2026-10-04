@@ -1,0 +1,4 @@
+# Start tiny-dfr whenever the Touch Bar display appears, not only at boot
+# (for reconnects other than resume, which omabar-resume.service handles).
+# Installed by Omabar (system/install.sh).
+SUBSYSTEM=="drm", KERNEL=="card[0-9]*", DRIVERS=="appletbdrm", ACTION=="add", TAG+="systemd", ENV{SYSTEMD_WANTS}+="tiny-dfr.service"

@@ -1,0 +1,160 @@
+{
+  "name": "Capture",
+  "description": "Region screenshot, screen recording (red; tap again to stop), copy text from the screen, scan a QR code, pick a colour.",
+  "mediaLayerDefault": true,
+  "showButtonOutlines": false,
+  "adaptiveBrightness": true,
+  "fontTemplate": "JetBrainsMono Nerd Font:bold",
+  "buttons": [
+    {
+      "icon": "brightness_low",
+      "tint": "foreground",
+      "key": "BrightnessDown"
+    },
+    {
+      "icon": "brightness_high",
+      "tint": "foreground",
+      "key": "BrightnessUp"
+    },
+    {
+      "spacer": true,
+      "stretch": 1
+    },
+    {
+      "icon": "screenshot_region",
+      "tint": "accent",
+      "key": "F17",
+      "hyprKey": "code:195",
+      "command": "omarchy capture screenshot region"
+    },
+    {
+      "icon": "radio_button_checked",
+      "tint": "danger",
+      "key": "F18",
+      "hyprKey": "code:196",
+      "command": "omarchy capture screenrecording"
+    },
+    {
+      "icon": "document_scanner",
+      "tint": "accent",
+      "key": "F19",
+      "hyprKey": "code:197",
+      "command": "omarchy capture text"
+    },
+    {
+      "icon": "qr_code_scanner",
+      "tint": "accent",
+      "key": "F20",
+      "hyprKey": "code:198",
+      "command": "omarchy capture qr"
+    },
+    {
+      "icon": "colorize",
+      "tint": "accent",
+      "key": "F21",
+      "hyprKey": "code:199",
+      "command": "hyprpicker -a"
+    },
+    {
+      "spacer": true,
+      "stretch": 1
+    },
+    {
+      "icon": "play_pause",
+      "tint": "foreground",
+      "key": "PlayPause"
+    },
+    {
+      "icon": "volume_down",
+      "tint": "foreground",
+      "key": "VolumeDown"
+    },
+    {
+      "icon": "volume_up",
+      "tint": "foreground",
+      "key": "VolumeUp"
+    },
+    {
+      "spacer": true,
+      "stretch": 1
+    },
+    {
+      "time": "%-I:%M %p",
+      "stretch": 2
+    }
+  ],
+  "fnLayer": [
+    {
+      "icon": "fast_rewind",
+      "tint": "foreground",
+      "key": "PreviousSong"
+    },
+    {
+      "icon": "fast_forward",
+      "tint": "foreground",
+      "key": "NextSong"
+    },
+    {
+      "icon": "volume_off",
+      "tint": "foreground",
+      "key": "Mute"
+    },
+    {
+      "icon": "mic_off",
+      "tint": "foreground",
+      "key": "MicMute"
+    },
+    {
+      "spacer": true,
+      "stretch": 1
+    },
+    {
+      "text": "F1",
+      "key": "F1"
+    },
+    {
+      "text": "F2",
+      "key": "F2"
+    },
+    {
+      "text": "F3",
+      "key": "F3"
+    },
+    {
+      "text": "F4",
+      "key": "F4"
+    },
+    {
+      "text": "F5",
+      "key": "F5"
+    },
+    {
+      "text": "F6",
+      "key": "F6"
+    },
+    {
+      "text": "F7",
+      "key": "F7"
+    },
+    {
+      "text": "F8",
+      "key": "F8"
+    },
+    {
+      "text": "F9",
+      "key": "F9"
+    },
+    {
+      "text": "F10",
+      "key": "F10"
+    },
+    {
+      "text": "F11",
+      "key": "F11"
+    },
+    {
+      "text": "F12",
+      "key": "F12"
+    }
+  ]
+}

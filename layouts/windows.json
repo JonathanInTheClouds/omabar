@@ -1,0 +1,182 @@
+{
+  "name": "Windows",
+  "description": "A Hyprland remote: close, fullscreen, tiled fullscreen, pop out, split, group, scratchpad and gaps, plus workspaces 1–4.",
+  "mediaLayerDefault": true,
+  "showButtonOutlines": true,
+  "adaptiveBrightness": true,
+  "fontTemplate": "JetBrainsMono Nerd Font:bold",
+  "buttons": [
+    {
+      "text": "󰅖 close",
+      "key": [
+        "LeftMeta",
+        "W"
+      ]
+    },
+    {
+      "text": "󰊓 full",
+      "key": [
+        "LeftMeta",
+        "F"
+      ]
+    },
+    {
+      "text": "󰕮 tile",
+      "key": [
+        "LeftMeta",
+        "LeftCtrl",
+        "F"
+      ]
+    },
+    {
+      "text": "󰏌 pop",
+      "key": [
+        "LeftMeta",
+        "O"
+      ]
+    },
+    {
+      "text": "󰯌 split",
+      "key": [
+        "LeftMeta",
+        "J"
+      ]
+    },
+    {
+      "text": "󰓩 group",
+      "key": [
+        "LeftMeta",
+        "G"
+      ]
+    },
+    {
+      "text": "󰀼 stash",
+      "key": [
+        "LeftMeta",
+        "LeftAlt",
+        "S"
+      ]
+    },
+    {
+      "text": "󰘖 gaps",
+      "key": [
+        "LeftMeta",
+        "LeftShift",
+        "Backspace"
+      ]
+    },
+    {
+      "text": "1",
+      "key": [
+        "LeftMeta",
+        "Num1"
+      ]
+    },
+    {
+      "text": "2",
+      "key": [
+        "LeftMeta",
+        "Num2"
+      ]
+    },
+    {
+      "text": "3",
+      "key": [
+        "LeftMeta",
+        "Num3"
+      ]
+    },
+    {
+      "text": "4",
+      "key": [
+        "LeftMeta",
+        "Num4"
+      ]
+    }
+  ],
+  "fnLayer": [
+    {
+      "icon": "brightness_low",
+      "tint": "white",
+      "key": "BrightnessDown"
+    },
+    {
+      "icon": "brightness_high",
+      "tint": "white",
+      "key": "BrightnessUp"
+    },
+    {
+      "icon": "play_pause",
+      "tint": "white",
+      "key": "PlayPause"
+    },
+    {
+      "icon": "volume_off",
+      "tint": "white",
+      "key": "Mute"
+    },
+    {
+      "icon": "volume_down",
+      "tint": "white",
+      "key": "VolumeDown"
+    },
+    {
+      "icon": "volume_up",
+      "tint": "white",
+      "key": "VolumeUp"
+    },
+    {
+      "icon": "mic_off",
+      "tint": "white",
+      "key": "MicMute"
+    },
+    {
+      "text": "F1",
+      "key": "F1"
+    },
+    {
+      "text": "F2",
+      "key": "F2"
+    },
+    {
+      "text": "F3",
+      "key": "F3"
+    },
+    {
+      "text": "F4",
+      "key": "F4"
+    },
+    {
+      "text": "F5",
+      "key": "F5"
+    },
+    {
+      "text": "F6",
+      "key": "F6"
+    },
+    {
+      "text": "F7",
+      "key": "F7"
+    },
+    {
+      "text": "F8",
+      "key": "F8"
+    },
+    {
+      "text": "F9",
+      "key": "F9"
+    },
+    {
+      "text": "F10",
+      "key": "F10"
+    },
+    {
+      "text": "F11",
+      "key": "F11"
+    },
+    {
+      "text": "F12",
+      "key": "F12"
+    }
+  ]
+}

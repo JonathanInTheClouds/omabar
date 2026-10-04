@@ -1,0 +1,202 @@
+{
+  "name": "Browser",
+  "description": "Back, forward, reload, tab left and right, new tab, reopen a closed tab, close tab, the address bar and find.",
+  "mediaLayerDefault": true,
+  "showButtonOutlines": false,
+  "adaptiveBrightness": true,
+  "fontTemplate": "JetBrainsMono Nerd Font:bold",
+  "buttons": [
+    {
+      "icon": "arrow_back",
+      "tint": "foreground",
+      "key": [
+        "LeftAlt",
+        "Left"
+      ]
+    },
+    {
+      "icon": "arrow_forward",
+      "tint": "foreground",
+      "key": [
+        "LeftAlt",
+        "Right"
+      ]
+    },
+    {
+      "icon": "refresh",
+      "tint": "foreground",
+      "key": [
+        "LeftCtrl",
+        "R"
+      ]
+    },
+    {
+      "spacer": true,
+      "stretch": 1
+    },
+    {
+      "icon": "keyboard_double_arrow_left",
+      "tint": "foreground",
+      "key": [
+        "LeftCtrl",
+        "PageUp"
+      ]
+    },
+    {
+      "icon": "add",
+      "tint": "accent",
+      "key": [
+        "LeftCtrl",
+        "T"
+      ]
+    },
+    {
+      "icon": "history",
+      "tint": "foreground",
+      "key": [
+        "LeftCtrl",
+        "LeftShift",
+        "T"
+      ]
+    },
+    {
+      "icon": "close",
+      "tint": "foreground",
+      "key": [
+        "LeftCtrl",
+        "W"
+      ]
+    },
+    {
+      "icon": "keyboard_double_arrow_right",
+      "tint": "foreground",
+      "key": [
+        "LeftCtrl",
+        "PageDown"
+      ]
+    },
+    {
+      "spacer": true,
+      "stretch": 1
+    },
+    {
+      "icon": "search",
+      "tint": "foreground",
+      "key": [
+        "LeftCtrl",
+        "L"
+      ]
+    },
+    {
+      "icon": "find_in_page",
+      "tint": "foreground",
+      "key": [
+        "LeftCtrl",
+        "F"
+      ]
+    },
+    {
+      "spacer": true,
+      "stretch": 1
+    },
+    {
+      "icon": "play_pause",
+      "tint": "foreground",
+      "key": "PlayPause"
+    },
+    {
+      "icon": "volume_down",
+      "tint": "foreground",
+      "key": "VolumeDown"
+    },
+    {
+      "icon": "volume_up",
+      "tint": "foreground",
+      "key": "VolumeUp"
+    }
+  ],
+  "fnLayer": [
+    {
+      "icon": "brightness_low",
+      "tint": "foreground",
+      "key": "BrightnessDown"
+    },
+    {
+      "icon": "brightness_high",
+      "tint": "foreground",
+      "key": "BrightnessUp"
+    },
+    {
+      "icon": "fast_rewind",
+      "tint": "foreground",
+      "key": "PreviousSong"
+    },
+    {
+      "icon": "fast_forward",
+      "tint": "foreground",
+      "key": "NextSong"
+    },
+    {
+      "icon": "volume_off",
+      "tint": "foreground",
+      "key": "Mute"
+    },
+    {
+      "icon": "mic_off",
+      "tint": "foreground",
+      "key": "MicMute"
+    },
+    {
+      "spacer": true,
+      "stretch": 1
+    },
+    {
+      "text": "F1",
+      "key": "F1"
+    },
+    {
+      "text": "F2",
+      "key": "F2"
+    },
+    {
+      "text": "F3",
+      "key": "F3"
+    },
+    {
+      "text": "F4",
+      "key": "F4"
+    },
+    {
+      "text": "F5",
+      "key": "F5"
+    },
+    {
+      "text": "F6",
+      "key": "F6"
+    },
+    {
+      "text": "F7",
+      "key": "F7"
+    },
+    {
+      "text": "F8",
+      "key": "F8"
+    },
+    {
+      "text": "F9",
+      "key": "F9"
+    },
+    {
+      "text": "F10",
+      "key": "F10"
+    },
+    {
+      "text": "F11",
+      "key": "F11"
+    },
+    {
+      "text": "F12",
+      "key": "F12"
+    }
+  ]
+}

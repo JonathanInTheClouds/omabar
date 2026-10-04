@@ -1,0 +1,137 @@
+{
+  "name": "Quiet",
+  "description": "Fewer, bigger buttons in the foreground colour with a double-width play/pause. Previous, next, mute and mic move to Fn.",
+  "mediaLayerDefault": true,
+  "showButtonOutlines": false,
+  "adaptiveBrightness": true,
+  "buttons": [
+    {
+      "icon": "brightness_low",
+      "tint": "dim",
+      "key": "BrightnessDown"
+    },
+    {
+      "icon": "brightness_high",
+      "tint": "dim",
+      "key": "BrightnessUp"
+    },
+    {
+      "icon": "search",
+      "tint": "foreground",
+      "key": "Search",
+      "hyprKey": "XF86Search",
+      "command": "omarchy-menu toggle"
+    },
+    {
+      "icon": "terminal",
+      "tint": "foreground",
+      "key": "F13",
+      "hyprKey": "code:191",
+      "command": "omarchy-launch-terminal"
+    },
+    {
+      "icon": "public",
+      "tint": "foreground",
+      "key": "F14",
+      "hyprKey": "code:192",
+      "command": "omarchy-launch-browser"
+    },
+    {
+      "icon": "folder",
+      "tint": "foreground",
+      "key": "F15",
+      "hyprKey": "code:193",
+      "command": "omarchy-launch-nautilus"
+    },
+    {
+      "icon": "play_pause",
+      "tint": "foreground",
+      "key": "PlayPause",
+      "stretch": 2
+    },
+    {
+      "icon": "volume_down",
+      "tint": "dim",
+      "key": "VolumeDown"
+    },
+    {
+      "icon": "volume_up",
+      "tint": "dim",
+      "key": "VolumeUp"
+    }
+  ],
+  "fnLayer": [
+    {
+      "icon": "fast_rewind",
+      "tint": "foreground",
+      "key": "PreviousSong"
+    },
+    {
+      "icon": "fast_forward",
+      "tint": "foreground",
+      "key": "NextSong"
+    },
+    {
+      "icon": "volume_off",
+      "tint": "foreground",
+      "key": "Mute"
+    },
+    {
+      "icon": "mic_off",
+      "tint": "foreground",
+      "key": "MicMute"
+    },
+    {
+      "spacer": true,
+      "stretch": 1
+    },
+    {
+      "text": "F1",
+      "key": "F1"
+    },
+    {
+      "text": "F2",
+      "key": "F2"
+    },
+    {
+      "text": "F3",
+      "key": "F3"
+    },
+    {
+      "text": "F4",
+      "key": "F4"
+    },
+    {
+      "text": "F5",
+      "key": "F5"
+    },
+    {
+      "text": "F6",
+      "key": "F6"
+    },
+    {
+      "text": "F7",
+      "key": "F7"
+    },
+    {
+      "text": "F8",
+      "key": "F8"
+    },
+    {
+      "text": "F9",
+      "key": "F9"
+    },
+    {
+      "text": "F10",
+      "key": "F10"
+    },
+    {
+      "text": "F11",
+      "key": "F11"
+    },
+    {
+      "text": "F12",
+      "key": "F12"
+    }
+  ]
+}

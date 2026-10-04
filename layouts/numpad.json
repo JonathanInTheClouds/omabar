@@ -1,0 +1,155 @@
+{
+  "name": "Numpad",
+  "description": "The number pad this MacBook doesn't have: 0–9, decimal point, the four operators and Enter, as real keypad keys.",
+  "mediaLayerDefault": true,
+  "showButtonOutlines": true,
+  "adaptiveBrightness": true,
+  "fontTemplate": "JetBrainsMono Nerd Font:bold",
+  "buttons": [
+    {
+      "text": "1",
+      "key": "Kp1"
+    },
+    {
+      "text": "2",
+      "key": "Kp2"
+    },
+    {
+      "text": "3",
+      "key": "Kp3"
+    },
+    {
+      "text": "4",
+      "key": "Kp4"
+    },
+    {
+      "text": "5",
+      "key": "Kp5"
+    },
+    {
+      "text": "6",
+      "key": "Kp6"
+    },
+    {
+      "text": "7",
+      "key": "Kp7"
+    },
+    {
+      "text": "8",
+      "key": "Kp8"
+    },
+    {
+      "text": "9",
+      "key": "Kp9"
+    },
+    {
+      "text": "0",
+      "key": "Kp0"
+    },
+    {
+      "text": ".",
+      "key": "KpDot"
+    },
+    {
+      "text": "÷",
+      "key": "KpSlash"
+    },
+    {
+      "text": "×",
+      "key": "KpAsterisk"
+    },
+    {
+      "text": "−",
+      "key": "KpMinus"
+    },
+    {
+      "text": "+",
+      "key": "KpPlus"
+    },
+    {
+      "text": "⏎",
+      "key": "KpEnter",
+      "stretch": 2
+    }
+  ],
+  "fnLayer": [
+    {
+      "icon": "brightness_low",
+      "tint": "white",
+      "key": "BrightnessDown"
+    },
+    {
+      "icon": "brightness_high",
+      "tint": "white",
+      "key": "BrightnessUp"
+    },
+    {
+      "icon": "play_pause",
+      "tint": "white",
+      "key": "PlayPause"
+    },
+    {
+      "icon": "volume_off",
+      "tint": "white",
+      "key": "Mute"
+    },
+    {
+      "icon": "volume_down",
+      "tint": "white",
+      "key": "VolumeDown"
+    },
+    {
+      "icon": "volume_up",
+      "tint": "white",
+      "key": "VolumeUp"
+    },
+    {
+      "text": "F1",
+      "key": "F1"
+    },
+    {
+      "text": "F2",
+      "key": "F2"
+    },
+    {
+      "text": "F3",
+      "key": "F3"
+    },
+    {
+      "text": "F4",
+      "key": "F4"
+    },
+    {
+      "text": "F5",
+      "key": "F5"
+    },
+    {
+      "text": "F6",
+      "key": "F6"
+    },
+    {
+      "text": "F7",
+      "key": "F7"
+    },
+    {
+      "text": "F8",
+      "key": "F8"
+    },
+    {
+      "text": "F9",
+      "key": "F9"
+    },
+    {
+      "text": "F10",
+      "key": "F10"
+    },
+    {
+      "text": "F11",
+      "key": "F11"
+    },
+    {
+      "text": "F12",
+      "key": "F12"
+    }
+  ]
+}

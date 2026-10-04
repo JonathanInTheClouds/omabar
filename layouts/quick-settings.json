@@ -1,0 +1,194 @@
+{
+  "name": "Quick Settings",
+  "description": "Night light, idle lock, Bluetooth, silence notifications, hide the top bar, window gaps and display mirroring.",
+  "mediaLayerDefault": true,
+  "showButtonOutlines": false,
+  "adaptiveBrightness": true,
+  "fontTemplate": "JetBrainsMono Nerd Font:bold",
+  "buttons": [
+    {
+      "icon": "nightlight",
+      "tint": "foreground",
+      "key": [
+        "LeftMeta",
+        "LeftCtrl",
+        "N"
+      ]
+    },
+    {
+      "icon": "lock_clock",
+      "tint": "foreground",
+      "key": [
+        "LeftMeta",
+        "LeftCtrl",
+        "I"
+      ]
+    },
+    {
+      "icon": "bluetooth",
+      "tint": "foreground",
+      "key": [
+        "LeftCtrl",
+        "LeftAlt",
+        "LeftShift",
+        "F19"
+      ],
+      "hyprKey": "CTRL + ALT + SHIFT + code:197",
+      "command": "omarchy bluetooth power toggle"
+    },
+    {
+      "icon": "notifications_off",
+      "tint": "foreground",
+      "key": [
+        "LeftMeta",
+        "LeftCtrl",
+        "Comma"
+      ]
+    },
+    {
+      "icon": "web_asset",
+      "tint": "foreground",
+      "key": [
+        "LeftMeta",
+        "LeftShift",
+        "Space"
+      ]
+    },
+    {
+      "icon": "padding",
+      "tint": "foreground",
+      "key": [
+        "LeftMeta",
+        "LeftShift",
+        "Backspace"
+      ]
+    },
+    {
+      "icon": "screen_share",
+      "tint": "foreground",
+      "key": [
+        "LeftCtrl",
+        "LeftAlt",
+        "LeftShift",
+        "F20"
+      ],
+      "hyprKey": "CTRL + ALT + SHIFT + code:198",
+      "command": "omarchy hyprland monitor internal mirror toggle"
+    },
+    {
+      "spacer": true,
+      "stretch": 1
+    },
+    {
+      "icon": "brightness_low",
+      "tint": "foreground",
+      "key": "BrightnessDown"
+    },
+    {
+      "icon": "brightness_high",
+      "tint": "foreground",
+      "key": "BrightnessUp"
+    },
+    {
+      "spacer": true,
+      "stretch": 1
+    },
+    {
+      "time": "%-I:%M %p",
+      "stretch": 2
+    },
+    {
+      "battery": "both",
+      "stretch": 2
+    }
+  ],
+  "fnLayer": [
+    {
+      "icon": "fast_rewind",
+      "tint": "foreground",
+      "key": "PreviousSong"
+    },
+    {
+      "icon": "play_pause",
+      "tint": "foreground",
+      "key": "PlayPause"
+    },
+    {
+      "icon": "fast_forward",
+      "tint": "foreground",
+      "key": "NextSong"
+    },
+    {
+      "icon": "volume_off",
+      "tint": "foreground",
+      "key": "Mute"
+    },
+    {
+      "icon": "volume_down",
+      "tint": "foreground",
+      "key": "VolumeDown"
+    },
+    {
+      "icon": "volume_up",
+      "tint": "foreground",
+      "key": "VolumeUp"
+    },
+    {
+      "icon": "mic_off",
+      "tint": "foreground",
+      "key": "MicMute"
+    },
+    {
+      "spacer": true,
+      "stretch": 1
+    },
+    {
+      "text": "F1",
+      "key": "F1"
+    },
+    {
+      "text": "F2",
+      "key": "F2"
+    },
+    {
+      "text": "F3",
+      "key": "F3"
+    },
+    {
+      "text": "F4",
+      "key": "F4"
+    },
+    {
+      "text": "F5",
+      "key": "F5"
+    },
+    {
+      "text": "F6",
+      "key": "F6"
+    },
+    {
+      "text": "F7",
+      "key": "F7"
+    },
+    {
+      "text": "F8",
+      "key": "F8"
+    },
+    {
+      "text": "F9",
+      "key": "F9"
+    },
+    {
+      "text": "F10",
+      "key": "F10"
+    },
+    {
+      "text": "F11",
+      "key": "F11"
+    },
+    {
+      "text": "F12",
+      "key": "F12"
+    }
+  ]
+}

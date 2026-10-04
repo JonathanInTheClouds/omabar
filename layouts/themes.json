@@ -1,0 +1,173 @@
+{
+  "name": "Themes",
+  "description": "Switch Omarchy themes by name, plus the background switcher and the theme menu.",
+  "mediaLayerDefault": true,
+  "showButtonOutlines": true,
+  "adaptiveBrightness": true,
+  "fontTemplate": "JetBrainsMono Nerd Font:bold",
+  "buttons": [
+    {
+      "text": "󰸉 bg",
+      "key": [
+        "LeftMeta",
+        "LeftCtrl",
+        "Space"
+      ]
+    },
+    {
+      "text": "󰏘 themes",
+      "key": [
+        "LeftMeta",
+        "LeftShift",
+        "LeftCtrl",
+        "Space"
+      ]
+    },
+    {
+      "text": "hackerman",
+      "key": [
+        "LeftCtrl",
+        "LeftAlt",
+        "LeftShift",
+        "F13"
+      ],
+      "hyprKey": "CTRL + ALT + SHIFT + code:191",
+      "command": "omarchy theme set hackerman"
+    },
+    {
+      "text": "tokyo night",
+      "key": [
+        "LeftCtrl",
+        "LeftAlt",
+        "LeftShift",
+        "F14"
+      ],
+      "hyprKey": "CTRL + ALT + SHIFT + code:192",
+      "command": "omarchy theme set tokyo-night"
+    },
+    {
+      "text": "catppuccin",
+      "key": [
+        "LeftCtrl",
+        "LeftAlt",
+        "LeftShift",
+        "F15"
+      ],
+      "hyprKey": "CTRL + ALT + SHIFT + code:193",
+      "command": "omarchy theme set catppuccin"
+    },
+    {
+      "text": "gruvbox",
+      "key": [
+        "LeftCtrl",
+        "LeftAlt",
+        "LeftShift",
+        "F16"
+      ],
+      "hyprKey": "CTRL + ALT + SHIFT + code:194",
+      "command": "omarchy theme set gruvbox"
+    },
+    {
+      "text": "nord",
+      "key": [
+        "LeftCtrl",
+        "LeftAlt",
+        "LeftShift",
+        "F17"
+      ],
+      "hyprKey": "CTRL + ALT + SHIFT + code:195",
+      "command": "omarchy theme set nord"
+    },
+    {
+      "text": "rose pine",
+      "key": [
+        "LeftCtrl",
+        "LeftAlt",
+        "LeftShift",
+        "F18"
+      ],
+      "hyprKey": "CTRL + ALT + SHIFT + code:196",
+      "command": "omarchy theme set rose-pine"
+    }
+  ],
+  "fnLayer": [
+    {
+      "icon": "brightness_low",
+      "tint": "white",
+      "key": "BrightnessDown"
+    },
+    {
+      "icon": "brightness_high",
+      "tint": "white",
+      "key": "BrightnessUp"
+    },
+    {
+      "icon": "play_pause",
+      "tint": "white",
+      "key": "PlayPause"
+    },
+    {
+      "icon": "volume_off",
+      "tint": "white",
+      "key": "Mute"
+    },
+    {
+      "icon": "volume_down",
+      "tint": "white",
+      "key": "VolumeDown"
+    },
+    {
+      "icon": "volume_up",
+      "tint": "white",
+      "key": "VolumeUp"
+    },
+    {
+      "text": "F1",
+      "key": "F1"
+    },
+    {
+      "text": "F2",
+      "key": "F2"
+    },
+    {
+      "text": "F3",
+      "key": "F3"
+    },
+    {
+      "text": "F4",
+      "key": "F4"
+    },
+    {
+      "text": "F5",
+      "key": "F5"
+    },
+    {
+      "text": "F6",
+      "key": "F6"
+    },
+    {
+      "text": "F7",
+      "key": "F7"
+    },
+    {
+      "text": "F8",
+      "key": "F8"
+    },
+    {
+      "text": "F9",
+      "key": "F9"
+    },
+    {
+      "text": "F10",
+      "key": "F10"
+    },
+    {
+      "text": "F11",
+      "key": "F11"
+    },
+    {
+      "text": "F12",
+      "key": "F12"
+    }
+  ]
+}

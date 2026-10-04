@@ -1,0 +1,17 @@
+# Bring tiny-dfr back after suspend. On Intel T2 Macs the Touch Bar drops off
+# the bus on resume; tiny-dfr crashes on the vanished display and systemd stops
+# it (BindsTo), and the stock unit only starts at boot. This runs once the
+# system is back, after the old process is gone, and starts it fresh.
+# Installed by Omabar (system/install.sh).
+[Unit]
+Description=Restart the Touch Bar daemon after resume (Omabar)
+After=suspend.target hibernate.target hybrid-sleep.target suspend-then-hibernate.target
+
+[Service]
+Type=oneshot
+ExecStartPre=/usr/bin/sleep 2
+ExecStart=-/usr/bin/systemctl reset-failed tiny-dfr.service
+ExecStart=/usr/bin/systemctl --no-block restart tiny-dfr.service
+
+[Install]
+WantedBy=suspend.target hibernate.target hybrid-sleep.target suspend-then-hibernate.target

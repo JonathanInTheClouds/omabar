@@ -1,0 +1,188 @@
+{
+  "name": "Clipboard",
+  "description": "Clipboard history, emoji, text from the screen, colours and QR codes, plus cut, copy and paste that work in terminals too.",
+  "mediaLayerDefault": true,
+  "showButtonOutlines": false,
+  "adaptiveBrightness": true,
+  "fontTemplate": "JetBrainsMono Nerd Font:bold",
+  "buttons": [
+    {
+      "icon": "content_paste",
+      "tint": "accent",
+      "key": [
+        "LeftMeta",
+        "LeftCtrl",
+        "V"
+      ]
+    },
+    {
+      "icon": "mood",
+      "tint": "accent",
+      "key": [
+        "LeftMeta",
+        "LeftCtrl",
+        "E"
+      ]
+    },
+    {
+      "icon": "document_scanner",
+      "tint": "accent",
+      "key": "F19",
+      "hyprKey": "code:197",
+      "command": "omarchy capture text"
+    },
+    {
+      "icon": "colorize",
+      "tint": "accent",
+      "key": "F21",
+      "hyprKey": "code:199",
+      "command": "hyprpicker -a"
+    },
+    {
+      "icon": "qr_code_scanner",
+      "tint": "accent",
+      "key": "F20",
+      "hyprKey": "code:198",
+      "command": "omarchy capture qr"
+    },
+    {
+      "spacer": true,
+      "stretch": 1
+    },
+    {
+      "text": "󰆐 cut",
+      "key": [
+        "LeftMeta",
+        "X"
+      ],
+      "stretch": 2
+    },
+    {
+      "text": "󰆏 copy",
+      "key": [
+        "LeftMeta",
+        "C"
+      ],
+      "stretch": 2
+    },
+    {
+      "text": "󰆒 paste",
+      "key": [
+        "LeftMeta",
+        "V"
+      ],
+      "stretch": 2
+    },
+    {
+      "spacer": true,
+      "stretch": 1
+    },
+    {
+      "icon": "play_pause",
+      "tint": "foreground",
+      "key": "PlayPause"
+    },
+    {
+      "icon": "volume_down",
+      "tint": "foreground",
+      "key": "VolumeDown"
+    },
+    {
+      "icon": "volume_up",
+      "tint": "foreground",
+      "key": "VolumeUp"
+    },
+    {
+      "spacer": true,
+      "stretch": 1
+    },
+    {
+      "time": "%-I:%M %p",
+      "stretch": 2
+    }
+  ],
+  "fnLayer": [
+    {
+      "icon": "brightness_low",
+      "tint": "foreground",
+      "key": "BrightnessDown"
+    },
+    {
+      "icon": "brightness_high",
+      "tint": "foreground",
+      "key": "BrightnessUp"
+    },
+    {
+      "icon": "fast_rewind",
+      "tint": "foreground",
+      "key": "PreviousSong"
+    },
+    {
+      "icon": "fast_forward",
+      "tint": "foreground",
+      "key": "NextSong"
+    },
+    {
+      "icon": "volume_off",
+      "tint": "foreground",
+      "key": "Mute"
+    },
+    {
+      "icon": "mic_off",
+      "tint": "foreground",
+      "key": "MicMute"
+    },
+    {
+      "spacer": true,
+      "stretch": 1
+    },
+    {
+      "text": "F1",
+      "key": "F1"
+    },
+    {
+      "text": "F2",
+      "key": "F2"
+    },
+    {
+      "text": "F3",
+      "key": "F3"
+    },
+    {
+      "text": "F4",
+      "key": "F4"
+    },
+    {
+      "text": "F5",
+      "key": "F5"
+    },
+    {
+      "text": "F6",
+      "key": "F6"
+    },
+    {
+      "text": "F7",
+      "key": "F7"
+    },
+    {
+      "text": "F8",
+      "key": "F8"
+    },
+    {
+      "text": "F9",
+      "key": "F9"
+    },
+    {
+      "text": "F10",
+      "key": "F10"
+    },
+    {
+      "text": "F11",
+      "key": "F11"
+    },
+    {
+      "text": "F12",
+      "key": "F12"
+    }
+  ]
+}

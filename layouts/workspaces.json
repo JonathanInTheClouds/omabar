@@ -1,0 +1,192 @@
+{
+  "name": "Workspaces",
+  "description": "Workspaces 1–5, launchers in the accent colour, media and a 12-hour clock. Brightness and files on Fn.",
+  "mediaLayerDefault": true,
+  "showButtonOutlines": false,
+  "adaptiveBrightness": true,
+  "fontTemplate": "JetBrainsMono Nerd Font:bold",
+  "buttons": [
+    {
+      "icon": "apps",
+      "tint": "accent",
+      "key": "Search",
+      "hyprKey": "XF86Search",
+      "command": "omarchy-menu toggle"
+    },
+    {
+      "spacer": true,
+      "stretch": 1
+    },
+    {
+      "text": "1",
+      "key": [
+        "LeftMeta",
+        "Num1"
+      ]
+    },
+    {
+      "text": "2",
+      "key": [
+        "LeftMeta",
+        "Num2"
+      ]
+    },
+    {
+      "text": "3",
+      "key": [
+        "LeftMeta",
+        "Num3"
+      ]
+    },
+    {
+      "text": "4",
+      "key": [
+        "LeftMeta",
+        "Num4"
+      ]
+    },
+    {
+      "text": "5",
+      "key": [
+        "LeftMeta",
+        "Num5"
+      ]
+    },
+    {
+      "spacer": true,
+      "stretch": 1
+    },
+    {
+      "icon": "terminal",
+      "tint": "accent",
+      "key": "F13",
+      "hyprKey": "code:191",
+      "command": "omarchy-launch-terminal"
+    },
+    {
+      "icon": "public",
+      "tint": "accent",
+      "key": "F14",
+      "hyprKey": "code:192",
+      "command": "omarchy-launch-browser"
+    },
+    {
+      "spacer": true,
+      "stretch": 1
+    },
+    {
+      "icon": "play_pause",
+      "tint": "white",
+      "key": "PlayPause"
+    },
+    {
+      "icon": "volume_down",
+      "tint": "white",
+      "key": "VolumeDown"
+    },
+    {
+      "icon": "volume_up",
+      "tint": "white",
+      "key": "VolumeUp"
+    },
+    {
+      "spacer": true,
+      "stretch": 1
+    },
+    {
+      "time": "%-I:%M %p",
+      "stretch": 2
+    }
+  ],
+  "fnLayer": [
+    {
+      "icon": "brightness_low",
+      "tint": "white",
+      "key": "BrightnessDown"
+    },
+    {
+      "icon": "brightness_high",
+      "tint": "white",
+      "key": "BrightnessUp"
+    },
+    {
+      "icon": "folder",
+      "tint": "accent",
+      "key": "F15",
+      "hyprKey": "code:193",
+      "command": "omarchy-launch-nautilus"
+    },
+    {
+      "icon": "mic_off",
+      "tint": "white",
+      "key": "MicMute"
+    },
+    {
+      "icon": "fast_rewind",
+      "tint": "white",
+      "key": "PreviousSong"
+    },
+    {
+      "icon": "fast_forward",
+      "tint": "white",
+      "key": "NextSong"
+    },
+    {
+      "icon": "volume_off",
+      "tint": "white",
+      "key": "Mute"
+    },
+    {
+      "spacer": true,
+      "stretch": 1
+    },
+    {
+      "text": "F1",
+      "key": "F1"
+    },
+    {
+      "text": "F2",
+      "key": "F2"
+    },
+    {
+      "text": "F3",
+      "key": "F3"
+    },
+    {
+      "text": "F4",
+      "key": "F4"
+    },
+    {
+      "text": "F5",
+      "key": "F5"
+    },
+    {
+      "text": "F6",
+      "key": "F6"
+    },
+    {
+      "text": "F7",
+      "key": "F7"
+    },
+    {
+      "text": "F8",
+      "key": "F8"
+    },
+    {
+      "text": "F9",
+      "key": "F9"
+    },
+    {
+      "text": "F10",
+      "key": "F10"
+    },
+    {
+      "text": "F11",
+      "key": "F11"
+    },
+    {
+      "text": "F12",
+      "key": "F12"
+    }
+  ]
+}

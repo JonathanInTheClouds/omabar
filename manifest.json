@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "io.github.jonathanintheclouds.omabar",
+  "name": "Omabar",
+  "version": "0.1.0",
+  "author": "Jonathan Dowdell",
+  "license": "MIT",
+  "repository": "https://github.com/jonathanintheclouds/omabar",
+  "description": "Touch Bar layouts for Omarchy on Intel T2 MacBook Pros: 17 ready-made layouts, a live preview panel, per-app switching, weather, and colours that can follow your theme. Built on tiny-dfr.",
+  "kinds": ["bar-widget"],
+  "entryPoints": {
+    "barWidget": "Panel.qml"
+  },
+  "barWidget": {
+    "displayName": "Omabar",
+    "description": "Preview and switch Touch Bar layouts",
+    "category": "Hardware",
+    "aliases": ["touchbar", "touch-bar", "tiny-dfr", "omabar"],
+    "allowMultiple": false,
+    "defaultSection": "right"
+  }
+}
