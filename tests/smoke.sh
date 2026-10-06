@@ -54,6 +54,23 @@ m.sync_binds()
 assert a.startswith("-- your binds") and a.count(m.BIND_BEGIN) == 1 and os.stat(m.BINDINGS).st_mtime_ns == t
 EOF
 
+# QML: every Text must be plain text. Qt's default AutoText renders HTML, so an
+# app could name its window '<img src="https://…">' and make the shell fetch it.
+t "every QML Text item is plain text (no HTML from app names)" "python3 -I -c '
+import re, sys
+bad = []
+for p in sys.argv[1:]:
+    lines = open(p).read().split(chr(10))
+    for i, line in enumerate(lines):
+        if re.match(r\"^\\s*(component \\w+: )?Text \\{\\s*$\", line):
+            depth, j, ok = 1, i + 1, False
+            while j < len(lines) and depth > 0:
+                depth += lines[j].count(chr(123)) - lines[j].count(chr(125))
+                ok = ok or (depth == 1 and \"textFormat: Text.PlainText\" in lines[j])
+                j += 1
+            if not ok: bad.append(p + \":\" + str(i + 1))
+sys.exit(1 if bad else 0)' '$ROOT/Panel.qml' '$ROOT/Editor.qml'"
+
 # Editor commands: key assignment, rules validation, try without a helper
 out=$(echo '{"name":"T","buttons":[{"icon":"terminal","tint":"accent","command":"omarchy-launch-terminal"},{"text":"x","command":"echo omabar-test"}]}' | "$O" save t-one 2>&1)
 t "save reuses the key of a known command" "echo '$out' | grep -q '\"hyprKey\": \"code:191\"'"

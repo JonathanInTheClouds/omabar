@@ -533,6 +533,7 @@ Item {
             spacing: Style.space(14)
 
             Text {
+              textFormat: Text.PlainText
               text: "󰌌"
               color: Color.popups.text
               font.family: Style.font.family
@@ -541,6 +542,7 @@ Item {
             Column {
               Layout.fillWidth: true
               Text {
+                textFormat: Text.PlainText
                 text: "Omabar editor"
                 color: Color.popups.text
                 font.family: Style.font.family
@@ -548,6 +550,7 @@ Item {
                 font.bold: true
               }
               Text {
+                textFormat: Text.PlainText
                 text: root.tab === "layout"
                       ? "Change a layout, try it on the Touch Bar, save it as yours."
                       : "Choose which layout each app gets when Omabar follows the focused app."
@@ -589,6 +592,7 @@ Item {
               anchors.margins: Style.space(8)
               spacing: Style.space(10)
               Text {
+                textFormat: Text.PlainText
                 Layout.fillWidth: true
                 text: root.confirm === "close" ? "You have unsaved changes. Close without saving?"
                                                : "You have unsaved changes to this layout. Switch and discard them?"
@@ -640,6 +644,7 @@ Item {
                 onPicked: function (v) { root.selectLayout(v) }
               }
               Text {
+                textFormat: Text.PlainText
                 Layout.fillWidth: true
                 text: !root.current ? ""
                       : root.current.source === "yours"
@@ -678,6 +683,7 @@ Item {
               Layout.fillWidth: true
               spacing: Style.space(10)
               Text {
+                textFormat: Text.PlainText
                 text: "Name for the copy:"
                 color: Color.popups.text
                 font.family: Style.font.family
@@ -728,6 +734,7 @@ Item {
                 onTextChanged: if (!activeFocus) cursorPosition = 0
               }
               Text {
+                textFormat: Text.PlainText
                 text: "Grey keys"
                 color: Color.popups.text
                 font.family: Style.font.family
@@ -769,6 +776,7 @@ Item {
                 onChanged: function (v) { root.row = v; root.sel = root.buttons.length ? 0 : -1; root.iconPicker = false }
               }
               Text {
+                textFormat: Text.PlainText
                 Layout.fillWidth: true
                 text: root.buttons.length + " buttons. Drag to reorder, click to edit."
                       + (root.buttons.length > 24 ? "  Over 24 buttons may not draw properly." : "")
@@ -852,6 +860,7 @@ Item {
                   border.width: 1
                   border.color: Qt.rgba(1, 1, 1, 0.3)
                   Text {
+                    textFormat: Text.PlainText
                     anchors.centerIn: parent
                     text: "+"
                     color: Color.popups.text
@@ -895,6 +904,7 @@ Item {
               border.color: Qt.rgba(1, 1, 1, 0.08)
 
               Text {
+                textFormat: Text.PlainText
                 visible: !root.selected && !!root.draft
                 anchors.centerIn: parent
                 text: root.buttons.length ? "Select a button to edit it." : "This row is empty. Press + to add a button."
@@ -928,6 +938,7 @@ Item {
                     onPicked: function (v) { root.setKind(v) }
                   }
                   Text {
+                    textFormat: Text.PlainText
                     text: "Width"
                     color: Color.popups.text
                     font.family: Style.font.family
@@ -992,6 +1003,7 @@ Item {
                     onClicked: { root.iconFilter = ""; root.iconPicker = true }
                   }
                   Text {
+                    textFormat: Text.PlainText
                     text: "Colour"
                     color: Color.popups.text
                     font.family: Style.font.family
@@ -1030,6 +1042,7 @@ Item {
                     onTextChanged: if (!activeFocus) cursorPosition = 0
                   }
                   Text {
+                    textFormat: Text.PlainText
                     Layout.fillWidth: true
                     text: "Always white on the Touch Bar. Nerd Font glyphs work."
                     color: Qt.darker(Color.popups.text, 1.4)
@@ -1089,6 +1102,7 @@ Item {
                       }
                     }
                     Text {
+                      textFormat: Text.PlainText
                       Layout.fillWidth: true
                       text: root.actionSummary(root.selected)
                       color: Color.accent
@@ -1150,6 +1164,7 @@ Item {
                       onClicked: if (cmdField.text.trim() !== "") root.setCommand(cmdField.text.trim())
                     }
                     Text {
+                      textFormat: Text.PlainText
                       Layout.fillWidth: true
                       text: "Omabar gives it a spare key and adds the Hyprland bind when you save."
                       color: Qt.darker(Color.popups.text, 1.4)
@@ -1185,6 +1200,7 @@ Item {
                     }
                   }
                   Text {
+                    textFormat: Text.PlainText
                     Layout.fillWidth: true
                     text: "Add your own SVGs to ~/.config/omarchy/omabar/icons/"
                     color: Qt.darker(Color.popups.text, 1.4)
@@ -1226,6 +1242,7 @@ Item {
                         tint: root.selected ? (root.pal[root.selected.tint || "white"] || "white") : "white"
                       }
                       Text {
+                        textFormat: Text.PlainText
                         anchors.bottom: parent.bottom
                         anchors.bottomMargin: Style.space(4)
                         width: parent.width
@@ -1252,6 +1269,7 @@ Item {
               Layout.fillWidth: true
               spacing: Style.space(10)
               Text {
+                textFormat: Text.PlainText
                 Layout.fillWidth: true
                 text: root.error !== "" ? root.error
                       : root.trying ? "On your Touch Bar now. It goes back in " + root.tryLeft + " s."
@@ -1337,6 +1355,7 @@ Item {
             }
 
             Text {
+              textFormat: Text.PlainText
               Layout.fillWidth: true
               text: "Rules run top to bottom; the first whose app pattern matches the focused window's class wins. Apps with no rule, and empty desktops, use your last pick, else the default."
               color: Qt.darker(Color.popups.text, 1.4)
@@ -1367,6 +1386,7 @@ Item {
                     Layout.fillWidth: true
                     spacing: Style.space(10)
                     Text {
+                      textFormat: Text.PlainText
                       text: (index + 1) + "."
                       color: Qt.darker(Color.popups.text, 1.4)
                       font.family: Style.font.family
@@ -1382,6 +1402,7 @@ Item {
                       onTextChanged: if (!activeFocus) cursorPosition = 0
                     }
                     Text {
+                      textFormat: Text.PlainText
                       text: "→"
                       color: Color.popups.text
                       font.pixelSize: Style.font.body
@@ -1452,6 +1473,7 @@ Item {
               Layout.fillWidth: true
               spacing: Style.space(10)
               Text {
+                textFormat: Text.PlainText
                 Layout.fillWidth: true
                 text: root.error !== "" ? root.error : root.status !== "" ? root.status : root.rulesDirty ? "Unsaved changes." : ""
                 color: root.error !== "" ? Color.urgent : Color.popups.text
@@ -1503,6 +1525,7 @@ Item {
   }
 
   component Label: Text {
+    textFormat: Text.PlainText
     color: Color.popups.text
     font.family: Style.font.family
     font.pixelSize: Style.font.bodySmall
@@ -1556,6 +1579,7 @@ Item {
             : face.b ? (root.pal[face.b.tint || "white"] || "white") : "white"
     }
     Text {
+      textFormat: Text.PlainText
       visible: face.kind !== "icon" && face.kind !== "wxicon" && face.kind !== "spacer"
       anchors.centerIn: parent
       width: parent.width
@@ -1573,6 +1597,7 @@ Item {
             : face.kind === "wxtemp" ? "78°" : ""
     }
     Text {
+      textFormat: Text.PlainText
       visible: face.kind === "spacer" && face.large
       anchors.centerIn: parent
       text: "gap"

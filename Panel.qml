@@ -374,6 +374,7 @@ Panel {
             implicitHeight: Math.max(heroIcon.implicitHeight, heroLabels.implicitHeight)
 
             Text {
+              textFormat: Text.PlainText
               id: heroIcon
               text: "󰌌"
               color: root.bar.foreground
@@ -392,6 +393,7 @@ Panel {
               spacing: Style.space(2)
 
               Text {
+                textFormat: Text.PlainText
                 text: "Omabar"
                 color: root.bar.foreground
                 font.family: root.bar.fontFamily
@@ -399,6 +401,7 @@ Panel {
                 font.bold: true
               }
               Text {
+                textFormat: Text.PlainText
                 text: (root.applyingId !== "" ? "Applying " + root.applyingId
                       : root.activeLayout ? root.activeLayout.name + " is on the bar" + (root.follow ? " · following apps" : "")
                       : root.layouts.length + " saved layouts").toUpperCase()
@@ -429,6 +432,7 @@ Panel {
               spacing: Style.space(2)
 
               Text {
+                textFormat: Text.PlainText
                 text: "Follow the focused app"
                 color: root.bar.foreground
                 font.family: root.bar.fontFamily
@@ -436,6 +440,7 @@ Panel {
                 font.bold: true
               }
               Text {
+                textFormat: Text.PlainText
                 text: root.follow && !root.passwordless
                       ? "Paused until Omabar is set up (see below)."
                       : root.follow
@@ -450,6 +455,7 @@ Panel {
                 wrapMode: Text.Wrap
               }
               Text {
+                textFormat: Text.PlainText
                 text: "Edit rules…"
                 color: Color.accent
                 font.family: root.bar.fontFamily
@@ -464,6 +470,7 @@ Panel {
                 }
               }
               Text {
+                textFormat: Text.PlainText
                 visible: root.ruleWarnings.length > 0
                 text: "Rules file: " + root.ruleWarnings.join("; ")
                 color: Color.urgent
@@ -498,6 +505,7 @@ Panel {
               spacing: Style.space(2)
 
               Text {
+                textFormat: Text.PlainText
                 text: "Return to your pick on an empty desktop"
                 color: root.bar.foreground
                 font.family: root.bar.fontFamily
@@ -505,6 +513,7 @@ Panel {
                 font.bold: true
               }
               Text {
+                textFormat: Text.PlainText
                 text: (root.emptyDefault
                       ? "With no window focused, the bar goes back to " + root.pickName() + "."
                       : "With no window focused, the bar keeps the last app's layout.")
@@ -542,6 +551,7 @@ Panel {
               spacing: Style.space(2)
 
               Text {
+                textFormat: Text.PlainText
                 text: "Match the Omarchy theme"
                 color: root.bar.foreground
                 font.family: root.bar.fontFamily
@@ -549,6 +559,7 @@ Panel {
                 font.bold: true
               }
               Text {
+                textFormat: Text.PlainText
                 text: root.colors === "theme"
                       ? "Icon colours follow the current theme and change when you switch themes, kept readable on the Touch Bar's black."
                       : "Off: Omabar's own colours, green launchers and pale system keys, whatever the theme."
@@ -572,6 +583,7 @@ Panel {
           }
 
           Text {
+            textFormat: Text.PlainText
             visible: !root.supported
             text: "This Mac (" + (root.model || "unknown model") + ") isn't an Intel T2 MacBook Pro with a Touch Bar. Omabar is built for MacBookPro15,x and 16,x."
             color: Color.urgent
@@ -625,6 +637,7 @@ Panel {
               implicitHeight: isActive ? activeTag.implicitHeight : activateButton.implicitHeight
 
               Text {
+                textFormat: Text.PlainText
                 id: activeTag
                 visible: actionBox.isActive
                 text: "● ACTIVE"
@@ -660,6 +673,7 @@ Panel {
             spacing: Style.space(10)
 
             Text {
+              textFormat: Text.PlainText
               text: !preview.l ? "" : preview.broken ? preview.l.error : (preview.l.description || "")
               visible: text !== ""
               color: preview.broken ? Color.urgent : root.bar.foreground
@@ -684,6 +698,7 @@ Panel {
               spacing: Style.space(8)
 
               Text {
+                textFormat: Text.PlainText
                 id: fnLabel
                 text: "FN"
                 anchors.verticalCenter: parent.verticalCenter
@@ -706,6 +721,7 @@ Panel {
           }
 
           Text {
+            textFormat: Text.PlainText
             visible: root.layouts.length === 0 && !listProc.running
             text: "No layouts found. Add layout files to " + (root.layoutsDir || "~/.config/omarchy/omabar/layouts")
             color: root.bar.foreground
@@ -718,6 +734,7 @@ Panel {
 
           // ---------- Status ----------
           Text {
+            textFormat: Text.PlainText
             visible: root.error !== ""
             text: root.error
             color: Color.urgent
@@ -743,6 +760,7 @@ Panel {
               spacing: Style.space(2)
 
               Text {
+                textFormat: Text.PlainText
                 text: (root.helperState === "live" ? "● " : "○ ")
                       + (root.helperState === "missing" ? "Setup needed" : "Passwordless switching is on")
                 // Only "on" takes the accent; some themes' urgent colour is green too.
@@ -752,6 +770,7 @@ Panel {
                 font.bold: true
               }
               Text {
+                textFormat: Text.PlainText
                 text: root.helperState === "live"
                       ? "A small helper at " + root.helperPath + " lets this panel, app following, weather and theme updates change the Touch Bar without asking for your password, and the bar updates in place without a blink. It only accepts configs and icons made by Omabar."
                       : "Omabar needs a one-time setup before it can change the Touch Bar: it installs tiny-dfr if needed, a small helper so switching needs no password, and a fix that brings the Touch Bar back after sleep. Set up asks for your password once. (Or in a terminal: sudo " + root.installScript.replace(/^\/home\/[^/]+/, "~") + ")"
@@ -837,6 +856,7 @@ Panel {
           }
 
           Text {
+            textFormat: Text.PlainText
             visible: key.modelData.kind === "icon" && key.modelData.path === ""
             anchors.centerIn: parent
             text: "?"
@@ -888,6 +908,7 @@ Panel {
             }
 
             Text {
+              textFormat: Text.PlainText
               visible: !parent.isBattery || key.modelData.mode !== "icon"
               anchors.verticalCenter: parent.verticalCenter
               width: Math.min(implicitWidth, key.width)

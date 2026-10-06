@@ -10,6 +10,7 @@
 - Editor keys: ←/→, Delete, Ctrl+S save, Ctrl+T try on the bar, Enter takes the first icon search match. Busy rows shrink to fit, so every button and + stay visible.
 - Bind descriptions come from the command, so restyling a button no longer reloads Hyprland.
 - Fixed: an empty row crashed tiny-dfr ("layer has 0 buttons") and left the Touch Bar on its crash screen. The main row now needs at least one button, an empty Fn row gets F1–F12, and Omabar restarts tiny-dfr whenever it finds it crashed. `doctor` checks for it.
+- Security: every text item in the panel and editor is plain text. Qt's default auto-detects HTML, so an app could set its window class to `<img src="https://…">` and make the shell load it when following the focused app (reported in marketplace review). A test now enforces plain text.
 - Tests can't reach the real helper (`OMABAR_HELPER`), plus new editor tests (58 total).
 
 ## 0.1.0 (2026-10-04)
