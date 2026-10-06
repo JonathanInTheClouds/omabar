@@ -24,8 +24,15 @@ Item {
   readonly property string tool: decodeURIComponent(
     Qt.resolvedUrl("bin/omabar").toString().replace(/^file:\/\//, ""))
   readonly property real barRatio: 2008 / 60
-  readonly property int chipUnit: 56
   readonly property int chipGap: 6
+  property real laneWidth: 1000
+  // Buttons shrink so a whole row (and the + tile) always fits the lane.
+  readonly property real chipUnit: {
+    var units = 0, n = buttons.length
+    for (var i = 0; i < n; i++) units += stretchOf(buttons[i])
+    var room = laneWidth - 56 - chipGap * (n + 1)
+    return Math.max(26, Math.min(56, units ? room / units : 56))
+  }
 
   // ---------- state ----------
   property var ed: null                // omabar editor-data
@@ -48,6 +55,8 @@ Item {
   property string iconFilter: ""
   property bool namingNew: false
   property var pendingPayload: ({})
+
+  onIconPickerChanged: if (iconPicker) Qt.callLater(function () { iconSearch.text = ""; iconSearch.forceActiveFocus() })
 
   readonly property var current: entryFor(currentId)
   readonly property var buttons: draft ? (draft[row] || []) : []
@@ -267,6 +276,12 @@ Item {
     sel = Math.max(0, Math.min(to, buttons.length - 1))
   }
 
+  function matchingIcons() {
+    if (!ed) return []
+    var q = iconFilter.toLowerCase().replace(/ /g, "_")
+    return ed.icons.filter(function (i) { return i.name.indexOf(q) !== -1 })
+  }
+
   function chipWidth(i) { return chipUnit * stretchOf(buttons[i]) + chipGap * (stretchOf(buttons[i]) - 1) }
 
   function chipX(i) {
@@ -344,16 +359,28 @@ Item {
           for (var i = 0; i < d.icons.length; i++) map[d.icons[i].name] = d.icons[i]
           root.iconMap = map
           root.ed = d
+          var r = d.rules || {}
+          if (root.rulesDraft) {
+            // Switches save immediately, so they always follow the file.
+            var keep = root.clone(root.rulesDraft)
+            keep.follow = r.follow === true
+            keep.emptyDefault = r.emptyDefault !== false
+            root.rulesDraft = keep
+          }
           if (!root.rulesDirty) {
-            var r = d.rules || {}
             root.rulesDraft = { rules: root.clone(r.rules || []), default: r.default || "",
                                 shortcut: r.shortcut === undefined || r.shortcut === null ? d.shortcutDefault : r.shortcut,
                                 follow: r.follow === true, emptyDefault: r.emptyDefault !== false }
           }
-          var want = root.pendingPayload.layout || root.currentId
+          var p = root.pendingPayload
+          var want = p.layout || root.currentId
           root.pendingPayload = ({})
           if (!root.entryFor(want)) want = d.layouts.length ? d.layouts[0].id : ""
           if (!root.dirty || want !== root.currentId) root.doSelect(want)
+          // Deep link: {"row": "fnLayer", "select": 3, "picker": "icon"}
+          if (p.row === "fnLayer" || p.row === "buttons") root.row = p.row
+          if (typeof p.select === "number" && p.select >= 0 && p.select < root.buttons.length) root.sel = p.select
+          if (p.picker === "icon" && root.kindOf(root.selected) === "icon") { root.iconFilter = ""; root.iconPicker = true }
         } catch (e) {
           root.error = "Couldn't load the editor data: " + e
         }
@@ -467,6 +494,18 @@ Item {
         else root.dismiss()
       }
       Keys.onDeletePressed: if (root.tab === "layout" && !root.iconPicker) root.removeButton()
+      // Ctrl+S saves (layout or rules), Ctrl+T tries the draft on the Touch Bar.
+      Keys.onPressed: function (event) {
+        if (!(event.modifiers & Qt.ControlModifier)) return
+        if (event.key === Qt.Key_S) {
+          if (root.tab === "rules") { if (root.rulesDirty) root.saveRules() }
+          else if (root.dirty) root.save()
+          event.accepted = true
+        } else if (event.key === Qt.Key_T && root.tab === "layout") {
+          if (root.trying) root.restore(); else root.tryOnBar()
+          event.accepted = true
+        }
+      }
       Keys.onLeftPressed: if (root.tab === "layout" && root.sel > 0) root.sel -= 1
       Keys.onRightPressed: if (root.tab === "layout" && root.sel < root.buttons.length - 1) root.sel += 1
 
@@ -592,13 +631,13 @@ Item {
               Layout.fillWidth: true
               spacing: Style.space(10)
 
-              Dropdown {
+              BoundDropdown {
                 Layout.preferredWidth: Style.space(320)
                 showLabel: false
                 options: root.layoutOptions()
-                value: root.currentId
+                current: root.currentId
                 fontFamily: Style.font.family
-                onChanged: function (v) { root.selectLayout(v) }
+                onPicked: function (v) { root.selectLayout(v) }
               }
               Text {
                 Layout.fillWidth: true
@@ -678,6 +717,7 @@ Item {
                 text: root.draft && root.draft.name ? root.draft.name : ""
                 font.family: Style.font.family
                 onTextEdited: root.setField("name", text)
+                onTextChanged: if (!activeFocus) cursorPosition = 0
               }
               TextField {
                 Layout.fillWidth: true
@@ -685,6 +725,7 @@ Item {
                 text: root.draft && root.draft.description ? root.draft.description : ""
                 font.family: Style.font.family
                 onTextEdited: root.setField("description", text)
+                onTextChanged: if (!activeFocus) cursorPosition = 0
               }
               Text {
                 text: "Grey keys"
@@ -741,7 +782,8 @@ Item {
             Flickable {
               id: lane
               Layout.fillWidth: true
-              Layout.preferredHeight: root.chipUnit + Style.space(12)
+              onWidthChanged: root.laneWidth = width
+              Layout.preferredHeight: 56 + Style.space(12)
               contentWidth: Math.max(width, laneContent.width + root.chipUnit + root.chipGap * 2)
               contentHeight: height
               clip: true
@@ -750,7 +792,7 @@ Item {
 
               Item {
                 id: laneContent
-                y: Style.space(6)
+                y: Style.space(6) + (56 - root.chipUnit) / 2
                 width: root.buttons.length ? root.chipX(root.buttons.length - 1) + root.chipWidth(root.buttons.length - 1) : 0
                 height: root.chipUnit
 
@@ -784,6 +826,7 @@ Item {
                       drag.target: ghost
                       drag.axis: Drag.XAxis
                       drag.threshold: 6
+                      preventStealing: true
                       onPressed: {
                         root.sel = chip.index
                         ghost.from = chip.index
@@ -802,7 +845,7 @@ Item {
                 // add button
                 Rectangle {
                   x: laneContent.width + (root.buttons.length ? root.chipGap : 0)
-                  width: root.chipUnit
+                  width: Math.max(root.chipUnit, 40)
                   height: root.chipUnit
                   radius: Style.space(6)
                   color: "transparent"
@@ -871,7 +914,7 @@ Item {
                 Label { text: "Type" }
                 RowLayout {
                   spacing: Style.space(10)
-                  Dropdown {
+                  BoundDropdown {
                     Layout.preferredWidth: Style.space(220)
                     showLabel: false
                     fontFamily: Style.font.family
@@ -881,8 +924,8 @@ Item {
                       { value: "battery", label: "Battery" }, { value: "wxicon", label: "Weather icon" },
                       { value: "wxtemp", label: "Temperature" }, { value: "spacer", label: "Gap" }
                     ]
-                    value: root.kindOf(root.selected)
-                    onChanged: function (v) { root.setKind(v) }
+                    current: root.kindOf(root.selected)
+                    onPicked: function (v) { root.setKind(v) }
                   }
                   Text {
                     text: "Width"
@@ -984,6 +1027,7 @@ Item {
                     text: root.selected && root.selected.text ? root.selected.text : ""
                     font.family: Style.font.family
                     onTextEdited: root.setProp("text", text)
+                    onTextChanged: if (!activeFocus) cursorPosition = 0
                   }
                   Text {
                     Layout.fillWidth: true
@@ -996,7 +1040,7 @@ Item {
 
                 // clock/date format
                 Label { text: "Format"; visible: root.kindOf(root.selected) === "clock" || root.kindOf(root.selected) === "date" }
-                Dropdown {
+                BoundDropdown {
                   visible: root.kindOf(root.selected) === "clock" || root.kindOf(root.selected) === "date"
                   Layout.preferredWidth: Style.space(320)
                   showLabel: false
@@ -1006,21 +1050,21 @@ Item {
                     { value: "%a %b %-d", label: "Date (Sun Oct 4)" }, { value: "%-d %b", label: "Date (4 Oct)" },
                     { value: "%a %-I:%M %p", label: "Day and time (Sun 3:28 PM)" }
                   ]
-                  value: root.selected && root.selected.time ? root.selected.time : ""
-                  onChanged: function (v) { root.setProp("time", v) }
+                  current: root.selected && root.selected.time ? root.selected.time : ""
+                  onPicked: function (v) { root.setProp("time", v) }
                 }
 
                 // battery mode
                 Label { text: "Shows"; visible: root.kindOf(root.selected) === "battery" }
-                Dropdown {
+                BoundDropdown {
                   visible: root.kindOf(root.selected) === "battery"
                   Layout.preferredWidth: Style.space(320)
                   showLabel: false
                   fontFamily: Style.font.family
                   options: [{ value: "both", label: "Icon and percentage" }, { value: "icon", label: "Icon" },
                             { value: "percentage", label: "Percentage" }]
-                  value: root.selected && root.selected.battery ? root.selected.battery : ""
-                  onChanged: function (v) { root.setProp("battery", v) }
+                  current: root.selected && root.selected.battery ? root.selected.battery : ""
+                  onPicked: function (v) { root.setProp("battery", v) }
                 }
 
                 // action
@@ -1034,7 +1078,7 @@ Item {
                       id: actionTabs
                       options: [{ value: "key", label: "Key" }, { value: "shortcut", label: "Omarchy shortcut" },
                                 { value: "app", label: "Open app" }, { value: "command", label: "Run command" }]
-                      value: root.actionKind(root.selected)
+                      value: actionTabs.chosen || root.actionKind(root.selected)
                       fontFamily: Style.font.family
                       onChanged: function (v) { actionTabs.chosen = v }
                       property string chosen: ""
@@ -1055,17 +1099,17 @@ Item {
                   }
                   readonly property string mode: actionTabs.chosen || root.actionKind(root.selected)
 
-                  SearchableDropdown {
+                  BoundSearch {
                     visible: parent.mode === "key"
                     Layout.preferredWidth: Style.space(420)
                     showLabel: false
                     fontFamily: Style.font.family
                     triggerLabel: "Choose a key…"
                     options: root.ed ? root.ed.keys.map(function (k, i) { return { value: String(i), label: k.group + ": " + k.label } }) : []
-                    value: { var p = root.presetFor(root.selected ? root.selected.key : undefined); return p ? String(root.ed.keys.indexOf(p)) : "" }
-                    onChanged: function (v) { root.setKeyAction(root.ed.keys[parseInt(v)].key) }
+                    current: { var p = root.presetFor(root.selected ? root.selected.key : undefined); return p ? String(root.ed.keys.indexOf(p)) : "" }
+                    onPicked: function (v) { root.setKeyAction(root.ed.keys[parseInt(v)].key) }
                   }
-                  SearchableDropdown {
+                  BoundSearch {
                     visible: parent.mode === "shortcut"
                     Layout.preferredWidth: Style.space(560)
                     showLabel: false
@@ -1073,10 +1117,10 @@ Item {
                     triggerLabel: "Choose one of your shortcuts…"
                     placeholderText: "Search shortcuts…"
                     options: root.ed ? root.ed.shortcuts.map(function (s, i) { return { value: String(i), label: s.label + "   " + s.combo } }) : []
-                    value: { var s = root.shortcutFor(root.selected ? root.selected.key : undefined); return s ? String(root.ed.shortcuts.indexOf(s)) : "" }
-                    onChanged: function (v) { root.setKeyAction(root.ed.shortcuts[parseInt(v)].key) }
+                    current: { var s = root.shortcutFor(root.selected ? root.selected.key : undefined); return s ? String(root.ed.shortcuts.indexOf(s)) : "" }
+                    onPicked: function (v) { root.setKeyAction(root.ed.shortcuts[parseInt(v)].key) }
                   }
-                  SearchableDropdown {
+                  BoundSearch {
                     visible: parent.mode === "app"
                     Layout.preferredWidth: Style.space(420)
                     showLabel: false
@@ -1084,8 +1128,8 @@ Item {
                     triggerLabel: "Choose an app…"
                     placeholderText: "Search apps…"
                     options: root.ed ? root.ed.apps.map(function (a) { return { value: a.id, label: a.name } }) : []
-                    value: { var a = root.selected ? root.appFor(root.selected.command) : null; return a ? a.id : "" }
-                    onChanged: function (v) { root.setCommand("uwsm-app -- " + v) }
+                    current: { var a = root.selected ? root.appFor(root.selected.command) : null; return a ? a.id : "" }
+                    onPicked: function (v) { root.setCommand("uwsm-app -- " + v) }
                   }
                   RowLayout {
                     visible: parent.mode === "command"
@@ -1134,6 +1178,11 @@ Item {
                     placeholderText: "Search icons…"
                     font.family: Style.font.family
                     onTextChanged: root.iconFilter = text
+                    // Enter takes the first match.
+                    onAccepted: {
+                      var hits = root.matchingIcons()
+                      if (hits.length) { root.setProp("icon", hits[0].name); root.iconPicker = false }
+                    }
                   }
                   Text {
                     Layout.fillWidth: true
@@ -1156,7 +1205,7 @@ Item {
                   clip: true
                   cellWidth: Style.space(92)
                   cellHeight: Style.space(78)
-                  model: root.ed ? root.ed.icons.filter(function (i) { return i.name.indexOf(root.iconFilter.toLowerCase().replace(/ /g, "_")) !== -1 }) : []
+                  model: root.matchingIcons()
                   delegate: Item {
                     required property var modelData
                     width: Style.space(92)
@@ -1207,7 +1256,7 @@ Item {
                 text: root.error !== "" ? root.error
                       : root.trying ? "On your Touch Bar now. It goes back in " + root.tryLeft + " s."
                       : root.status !== "" ? root.status
-                      : root.dirty ? "Unsaved changes." : ""
+                      : root.dirty ? "Unsaved changes.  Ctrl+S saves, Ctrl+T tries it on the Touch Bar." : "Ctrl+T tries the layout on the Touch Bar."
                 color: root.error !== "" ? Color.urgent : root.trying ? Color.accent : Color.popups.text
                 font.family: Style.font.family
                 font.pixelSize: Style.font.bodySmall
@@ -1268,13 +1317,13 @@ Item {
               }
 
               Label { text: "Default layout" }
-              Dropdown {
+              BoundDropdown {
                 Layout.preferredWidth: Style.space(300)
                 showLabel: false
                 fontFamily: Style.font.family
                 options: root.layoutOptions()
-                value: root.rulesDraft ? root.rulesDraft.default : ""
-                onChanged: function (v) { root.rulesDraft.default = v; root.rulesDraft = root.clone(root.rulesDraft); root.rulesDirty = true }
+                current: root.rulesDraft ? root.rulesDraft.default : ""
+                onPicked: function (v) { root.rulesDraft.default = v; root.rulesDraft = root.clone(root.rulesDraft); root.rulesDirty = true }
               }
               Label { text: "Shortcut to open Omabar" }
               TextField {
@@ -1283,6 +1332,7 @@ Item {
                 text: root.rulesDraft ? root.rulesDraft.shortcut : ""
                 font.family: Style.font.family
                 onTextEdited: { root.rulesDraft.shortcut = text; root.rulesDirty = true }
+                onTextChanged: if (!activeFocus) cursorPosition = 0
               }
             }
 
@@ -1329,19 +1379,20 @@ Item {
                       text: rule ? rule.app : ""
                       font.family: Style.font.family
                       onTextEdited: { root.rulesDraft.rules[index].app = text; root.rulesDirty = true }
+                      onTextChanged: if (!activeFocus) cursorPosition = 0
                     }
                     Text {
                       text: "→"
                       color: Color.popups.text
                       font.pixelSize: Style.font.body
                     }
-                    Dropdown {
+                    BoundDropdown {
                       Layout.preferredWidth: Style.space(280)
                       showLabel: false
                       fontFamily: Style.font.family
                       options: root.layoutOptions()
-                      value: rule ? rule.layout : ""
-                      onChanged: function (v) { root.rulesDraft.rules[index].layout = v; root.rulesDirty = true }
+                      current: rule ? rule.layout : ""
+                      onPicked: function (v) { var r = root.clone(root.rulesDraft); r.rules[index].layout = v; root.rulesDraft = r; root.rulesDirty = true }
                     }
                     Button {
                       text: "▲"
@@ -1370,7 +1421,7 @@ Item {
                 RowLayout {
                   Layout.fillWidth: true
                   spacing: Style.space(10)
-                  SearchableDropdown {
+                  BoundSearch {
                     id: addFrom
                     Layout.preferredWidth: Style.space(360)
                     showLabel: false
@@ -1378,7 +1429,7 @@ Item {
                     triggerLabel: "Add a rule for a running app…"
                     placeholderText: "Search open apps…"
                     options: root.ed ? root.ed.runningApps : []
-                    onChanged: function (v) {
+                    onPicked: function (v) {
                       var r = root.clone(root.rulesDraft)
                       r.rules.push({ app: v.replace(/[.^$*+?()[\]{}|\\]/g, "\\$&"), layout: root.currentId || r.default })
                       root.rulesDraft = r
@@ -1433,6 +1484,24 @@ Item {
   }
 
   // ---------- components ----------
+  // Omarchy's dropdowns assign their own `value` when picked, which breaks a
+  // binding to the editor's state. These re-bind to `current` after each pick.
+  component BoundDropdown: Dropdown {
+    id: bd
+    property string current: ""
+    signal picked(string v)
+    value: current
+    onChanged: function (v) { bd.value = Qt.binding(function () { return bd.current }); bd.picked(v) }
+  }
+
+  component BoundSearch: SearchableDropdown {
+    id: bs
+    property string current: ""
+    signal picked(string v)
+    value: current
+    onChanged: function (v) { bs.value = Qt.binding(function () { return bs.current }); bs.picked(v) }
+  }
+
   component Label: Text {
     color: Color.popups.text
     font.family: Style.font.family

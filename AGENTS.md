@@ -54,7 +54,7 @@ Key facts:
 |---|---|
 | `manifest.json` | Plugin manifest (bar widget, entry `Panel.qml`). |
 | `Panel.qml` | Bar button and popup (`bar-widget` entry). Watches focus (Hyprland `activewindow` events), runs the weather timer every 15 min, shows settings and setup state, opens the editor. |
-| `Editor.qml` | The layout and rules editor (`panel` entry), a centred overlay. Open it with `omarchy-shell shell summon io.github.jonathanintheclouds.omabar '{"layout":"dev"}'` (or `'{"tab":"rules"}'`). It draws icons from their path data (QtQuick.Shapes), so any icon and tint previews without installing. |
+| `Editor.qml` | The layout and rules editor (`panel` entry), a centred overlay. Open it with `omarchy-shell shell summon io.github.jonathanintheclouds.omabar '{"layout":"dev"}'` (or `'{"tab":"rules"}'`). The payload can also deep-link a state: `{"layout":"dev","row":"fnLayer","select":3,"picker":"icon"}`. Keys: ←/→ select, Delete removes, Ctrl+S saves, Ctrl+T tries on the bar, Esc closes; Enter in the icon search takes the first match. It draws icons from their path data (QtQuick.Shapes), so any icon and tint previews without installing. |
 | `bin/omabar` | Backend. All logic lives here; the panel only displays `omabar list`. |
 | `layouts/*.json` | Built-in layouts (17). |
 | `icons/*.svg` | Uncoloured Material Symbols sources (filled, 48px, `viewBox="0 -960 960 960"`, a single `<path>`). |
@@ -175,6 +175,8 @@ For a combo, `key` is `["LeftCtrl","LeftAlt","LeftShift","F19"]` and `hyprKey` i
 
 - **The same `hyprKey` must mean the same command in every layout.** The first one found wins.
 - **Prefer sending an existing Omarchy shortcut** to adding a bind. List them with `hyprctl binds -j | jq -r '.[] | "\(.modmask)|\(.key)|\(.description)"'` (modmask SUPER 64, CTRL 4, ALT 8, SHIFT 1). Users customise these: on the reference machine SUPER+W is "close tab (Chromium/VS Code) / close window".
+- Bind descriptions ("Touch Bar: terminal") come from the **command**, never the icon, so restyling a button never rewrites `bindings.lua` (each rewrite reloads Hyprland).
+- **Omarchy's `Dropdown`/`SearchableDropdown` assign their own `value` when picked**, which breaks a QML binding. The editor wraps them (`BoundDropdown`, `BoundSearch`) to re-bind after each pick; use those for any dropdown bound to state.
 - **Never use old-style `hyprctl dispatch name args`.** This Hyprland uses a Lua config. The Lua form is `hyprctl dispatch 'hl.dsp.focus({ workspace = "5" })'`.
 
 ---

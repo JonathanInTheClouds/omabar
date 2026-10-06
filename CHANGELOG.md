@@ -7,6 +7,8 @@
 - **Try on Touch Bar:** puts the draft on the real bar for 20 seconds, then rolls back. Follow mode and weather pause meanwhile.
 - **Rules editor:** add rules from running apps, reorder, pick layouts, set the default and the shortcut.
 - **Shortcut:** SUPER + ALT + T opens Omabar (skipped if that combination is taken).
+- Editor keys: ←/→, Delete, Ctrl+S save, Ctrl+T try on the bar, Enter takes the first icon search match. Busy rows shrink to fit, so every button and + stay visible.
+- Bind descriptions come from the command, so restyling a button no longer reloads Hyprland.
 - Fixed: an empty row crashed tiny-dfr ("layer has 0 buttons") and left the Touch Bar on its crash screen. The main row now needs at least one button, an empty Fn row gets F1–F12, and Omabar restarts tiny-dfr whenever it finds it crashed. `doctor` checks for it.
 - Tests can't reach the real helper (`OMABAR_HELPER`), plus new editor tests (58 total).
 

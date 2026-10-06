@@ -492,11 +492,16 @@ def render(L):
 # layout at once. Switching layouts never touches the Hyprland config; the
 # block is rewritten only when the set of binds itself changes.
 def bind_label(b, lid):
-    if b.get("text"):
-        words = "".join(ch for ch in b["text"] if ord(ch) < 0xE000).strip()
-        if words:
-            return words
-    return str(b.get("icon") or lid).replace("_", " ")
+    """A readable, stable name for Omarchy's keybinding list, taken from the
+    command (not the icon) so restyling a button never rewrites the binds."""
+    cmd = str(b.get("command") or "").strip()
+    m = re.fullmatch(r"uwsm-app -- ([A-Za-z0-9._+-]+)\.desktop", cmd)
+    if m:
+        return m.group(1)
+    for prefix in ("omarchy-shell omarchy.", "omarchy-launch-", "omarchy-", "omarchy "):
+        if cmd.startswith(prefix):
+            return cmd[len(prefix):].replace("-", " ")
+    return cmd[:40] or lid
 
 
 def lua_str(s):
