@@ -53,7 +53,8 @@ Key facts:
 | Path | Role |
 |---|---|
 | `manifest.json` | Plugin manifest (bar widget, entry `Panel.qml`). |
-| `Panel.qml` | Bar button and popup. Watches focus (Hyprland `activewindow` events), runs the weather timer every 15 min, shows settings and setup state. |
+| `Panel.qml` | Bar button and popup (`bar-widget` entry). Watches focus (Hyprland `activewindow` events), runs the weather timer every 15 min, shows settings and setup state, opens the editor. |
+| `Editor.qml` | The layout and rules editor (`panel` entry), a centred overlay. Open it with `omarchy-shell shell summon io.github.jonathanintheclouds.omabar '{"layout":"dev"}'` (or `'{"tab":"rules"}'`). It draws icons from their path data (QtQuick.Shapes), so any icon and tint previews without installing. |
 | `bin/omabar` | Backend. All logic lives here; the panel only displays `omabar list`. |
 | `layouts/*.json` | Built-in layouts (17). |
 | `icons/*.svg` | Uncoloured Material Symbols sources (filled, 48px, `viewBox="0 -960 960 960"`, a single `<path>`). |
@@ -93,11 +94,18 @@ Key facts:
 | `colors default\|theme` | Sets the colour mode and retheme. |
 | `follow on\|off`, `empty-default on\|off` | Settings flags. |
 | `doctor` | Health check. Exits 1 if anything needs fixing and prints the fix. |
+| `editor-data` | JSON for the editor: raw layouts, icons with path data, palette, key presets, the user's Omarchy shortcuts (translated to tiny-dfr key combos), installed apps, rules, running app classes. |
+| `save <id>` (stdin: layout JSON) | Saves as one of the user's layouts. Buttons with a `command` but no key get a spare key: an already-bound command reuses its key; otherwise the next free one from F13–F24, Prog1–4, then CTRL+ALT+SHIFT+F13–F24. Re-syncs binds and re-applies the layout if it's live. |
+| `delete <id>` | Deletes a user layout. Built-ins can't be deleted (deleting an override brings the built-in back). |
+| `try` / `restore` | Put a draft (stdin) on the bar for up to 30 s (`~/.cache/omabar/trial-until` pauses follow mode and weather), then put the live layout back. Commands new in the draft don't run until saved. |
+| `save-rules` (stdin) | Validates and saves `rules`, `default` and `shortcut`. |
 | `migrate` | Imports settings from the `jonathan.touchbar-layouts` prototype and removes the austindixson bind block. |
 
 All commands that change things take an flock (`~/.cache/omabar/lock`), so focus changes, the weather refresh and clicks never interleave.
 
 ---
+
+Set `OMABAR_HELPER` to a missing path to make the backend act as if the helper isn't installed. **Tests must do this:** without it, `try`/`apply` in a sandboxed `$HOME` still reach the real helper and the real Touch Bar (this happened once during development).
 
 ## 5. Layout format
 
@@ -193,6 +201,7 @@ For a combo, `key` is `["LeftCtrl","LeftAlt","LeftShift","F19"]` and `hyprKey` i
   "follow": false,
   "emptyDefault": true,
   "default": "duotone-weather",
+  "shortcut": "SUPER + ALT + T",
   "rules": [
     { "app": "Alacritty|kitty|com.mitchellh.ghostty|foot|org.omarchy.agent", "layout": "dev" },
     { "app": "chromium|google-chrome|firefox|brave-browser|zen", "layout": "browser" }
@@ -207,7 +216,9 @@ Decisions in `cmd_auto`:
 4. No matching rule, or a class-less window (treated as app `"?"`): the **manual pick**, else `default`.
 5. No window at all: if `emptyDefault` is on, the manual pick, else `default`. If it's off, keep the current layout.
 
-Find a window's class with `hyprctl activewindow -j | jq -r .class`. Broken regexes and unknown layout ids show in red in the panel and in `doctor`.
+Find a window's class with `hyprctl activewindow -j | jq -r .class`.
+
+`shortcut` (default `SUPER + ALT + T`, empty for none) is written into the bind block and runs `omarchy-shell io.github.jonathanintheclouds.omabar toggle`, which opens the popup through its IPC target. Summoning the plugin id opens the editor instead, because the plugin has a `panel` entry. It's skipped if any other bind already uses that combination. Broken regexes and unknown layout ids show in red in the panel and in `doctor`.
 
 ---
 

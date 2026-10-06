@@ -10,6 +10,12 @@
   omabar follow on|off           turn following the focused app on or off
   omabar empty-default on|off    on an empty desktop, return to your pick (on) or keep the layout (off)
   omabar render <id>             print the tiny-dfr config a layout would produce (no changes)
+  omabar editor-data             JSON for the editor: raw layouts, icons, keys, shortcuts, apps, rules
+  omabar save <id>               save the layout JSON on stdin as one of your layouts
+  omabar delete <id>             delete one of your layouts (a built-in with that id comes back)
+  omabar try                     put the layout JSON on stdin on the bar until `omabar restore`
+  omabar restore                 put the live layout back after a try
+  omabar save-rules              save the rules JSON on stdin
   omabar doctor                  check the whole setup and print what is wrong
   omabar migrate                 import settings from jonathan.touchbar-layouts and remove its bind block
 
@@ -27,6 +33,7 @@ import stat
 import subprocess
 import sys
 import tempfile
+import time
 import tomllib
 
 PLUGIN = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
@@ -52,7 +59,8 @@ BIND_END = "-- omabar end"
 LEGACY_BIND_BEGIN = "-- io.github.austindixson.touchbar begin"
 LEGACY_BIND_END = "-- io.github.austindixson.touchbar end"
 
-HELPER = "/usr/local/libexec/omabar-helper"
+# Tests point this at a path that doesn't exist, so nothing can reach the real system.
+HELPER = os.environ.get("OMABAR_HELPER", "/usr/local/libexec/omabar-helper")
 ETC = "/etc/tiny-dfr"
 ETC_CONFIG = os.path.join(ETC, "config.toml")
 STOCK_ICONS = "/usr/share/tiny-dfr"
@@ -217,14 +225,17 @@ def tinted_svg(icon, tint):
     return re.sub(r"<path(?![^>]*\bfill=)", f'<path fill="{colour}"', svg)
 
 
-def wanted_icons():
-    """Every tinted icon any layout can show, including all weather states."""
+def wanted_icons(extra=()):
+    """Every tinted icon any layout can show, including all weather states.
+    `extra` adds unsaved layouts (a draft being tried on the bar)."""
     want = set()
+    layouts = []
     for lid in layout_ids():
         try:
-            L = read_layout(lid)
+            layouts.append(read_layout(lid))
         except (OSError, ValueError):
             continue
+    for L in list(layouts) + list(extra):
         for b in rows(L):
             if isinstance(b, dict) and b.get("icon") and b.get("tint", "white") in ROLES:
                 if icon_source(b["icon"]):
@@ -234,10 +245,10 @@ def wanted_icons():
     return want
 
 
-def generate_icons():
+def generate_icons(extra=()):
     """Write tinted icons for the current theme into the cache. Returns {name: svg}."""
     out = {}
-    for icon, tint in sorted(wanted_icons()):
+    for icon, tint in sorted(wanted_icons(extra)):
         out[icon_file(icon, tint)] = tinted_svg(icon, tint)
     os.makedirs(GEN_ICONS, exist_ok=True)
     for name, svg in out.items():
@@ -279,9 +290,9 @@ def install_icons(icons):
     run_helper(["icons"], bytes(blob))
 
 
-def sync_icons():
+def sync_icons(extra=()):
     """Make /etc/tiny-dfr hold exactly the icons for the current theme. True if it changed."""
-    icons = generate_icons()
+    icons = generate_icons(extra)
     if installed_icons_match(icons):
         return False
     install_icons(icons)
@@ -499,8 +510,47 @@ def all_binds():
         for b in rows(L):
             if isinstance(b, dict) and b.get("hyprKey") and b.get("command") and b["hyprKey"] not in seen:
                 seen[b["hyprKey"]] = (bind_label(b, lid), b["command"])
-    return [f"o.bind({lua_str(k)}, {lua_str('Touch Bar: ' + label)}, {lua_str(cmd)})"
-            for k, (label, cmd) in sorted(seen.items())]
+    lines = [f"o.bind({lua_str(k)}, {lua_str('Touch Bar: ' + label)}, {lua_str(cmd)})"
+             for k, (label, cmd) in sorted(seen.items())]
+    shortcut = panel_shortcut()
+    if shortcut and not shortcut_taken(shortcut):
+        lines.append(f"o.bind({lua_str(shortcut)}, {lua_str('Omabar: Touch Bar layouts')}, "
+                     f"{lua_str('omarchy-shell io.github.jonathanintheclouds.omabar toggle')})")
+    return lines
+
+
+# ---------- Omabar's own shortcut ----------
+DEFAULT_SHORTCUT = "SUPER + ALT + T"
+MODMASK = {"SHIFT": 1, "CTRL": 4, "ALT": 8, "SUPER": 64}
+
+
+def panel_shortcut():
+    s = load_rules().get("shortcut", DEFAULT_SHORTCUT)
+    return s if isinstance(s, str) and HYPR_KEY.match(s) else ""
+
+
+@functools.lru_cache(maxsize=None)
+def hypr_binds():
+    try:
+        r = subprocess.run(["hyprctl", "binds", "-j"], capture_output=True, text=True, timeout=3)
+        binds = json.loads(r.stdout or "[]")
+        return binds if isinstance(binds, list) else []
+    except (OSError, subprocess.SubprocessError, ValueError):
+        return []
+
+
+def shortcut_taken(combo):
+    """True if a bind that isn't Omabar's already uses this key combination."""
+    parts = [p.strip() for p in combo.split("+")]
+    mask = sum(MODMASK.get(p.upper(), 0) for p in parts[:-1])
+    key = parts[-1].upper()
+    for b in hypr_binds():
+        desc = str(b.get("description") or "")
+        if desc.startswith(("Omabar:", "Touch Bar")):
+            continue
+        if b.get("modmask") == mask and str(b.get("key", "")).upper() == key:
+            return True
+    return False
 
 
 def read_bindings():
@@ -806,9 +856,21 @@ def cmd_apply(lid, wx=None):
     atomic_write(LIVE, json.dumps(L, indent=2, ensure_ascii=False) + "\n")
 
 
+TRIAL = os.path.join(CACHE, "trial-until")
+
+
+def trial_active():
+    """A draft from the editor is on the bar; don't swap it out underneath."""
+    try:
+        with open(TRIAL) as f:
+            return float(f.read().strip()) > time.time()
+    except (OSError, ValueError):
+        return False
+
+
 def cmd_auto(app):
     rules = load_rules()
-    if not rules.get("follow") or not helper_ok():
+    if trial_active() or not rules.get("follow") or not helper_ok():
         return  # without the passwordless helper every switch would ask for a password
     win = focused_window()
     if win != "unknown":
@@ -829,6 +891,8 @@ def cmd_auto(app):
 
 
 def cmd_refresh_weather():
+    if trial_active():
+        return
     old, live = load_weather(), read_live()
     active = None
     for lid in layout_ids():
@@ -947,7 +1011,309 @@ def cmd_migrate():
         print("removed the old austindixson bind block from bindings.lua")
 
 
-MUTATING = {"apply", "auto", "refresh-weather", "retheme", "colors", "follow", "empty-default", "migrate"}
+# ---------- editor support ----------
+# Spare keys for buttons that run commands, in the order they are handed out.
+# (tiny-dfr key, Hyprland key). Hyprland codes are evdev + 8.
+SPARE_KEYS = (
+    [(f"F{n}", f"code:{183 + n - 13 + 8}") for n in range(13, 25)]
+    + [("Prog1", "code:156"), ("Prog2", "code:157"), ("Prog3", "code:210"), ("Prog4", "code:211")]
+    + [(["LeftCtrl", "LeftAlt", "LeftShift", f"F{n}"], f"CTRL + ALT + SHIFT + code:{183 + n - 13 + 8}")
+       for n in range(13, 25)]
+)
+
+# Hyprland key names -> tiny-dfr (input-linux) key names, for turning the
+# user's Omarchy shortcuts into Touch Bar key combos.
+HYPR_TO_KEY = {**{c: c for c in "ABCDEFGHIJKLMNOPQRSTUVWXYZ"},
+               **{str(d): f"Num{d}" for d in range(10)},
+               **{f"F{n}": f"F{n}" for n in range(1, 13)},
+               "SPACE": "Space", "RETURN": "Enter", "TAB": "Tab", "ESCAPE": "Esc",
+               "BACKSPACE": "Backspace", "DELETE": "Delete", "INSERT": "Insert",
+               "COMMA": "Comma", "PERIOD": "Dot", "SLASH": "Slash", "MINUS": "Minus",
+               "EQUAL": "Equal", "GRAVE": "Grave", "SEMICOLON": "Semicolon",
+               "APOSTROPHE": "Apostrophe", "BRACKETLEFT": "LeftBrace", "BRACKETRIGHT": "RightBrace",
+               "BACKSLASH": "Backslash", "LEFT": "Left", "RIGHT": "Right", "UP": "Up", "DOWN": "Down",
+               "HOME": "Home", "END": "End", "PRINT": "Sysrq"}
+MOD_KEYS = [(64, "LeftMeta", "SUPER"), (4, "LeftCtrl", "CTRL"), (8, "LeftAlt", "ALT"), (1, "LeftShift", "SHIFT")]
+
+KEY_PRESETS = (
+    [{"label": l, "key": k, "group": "Media"} for l, k in (
+        ("Play / pause", "PlayPause"), ("Previous track", "PreviousSong"), ("Next track", "NextSong"),
+        ("Mute", "Mute"), ("Volume down", "VolumeDown"), ("Volume up", "VolumeUp"), ("Mic mute", "MicMute"))]
+    + [{"label": l, "key": k, "group": "System"} for l, k in (
+        ("Brightness down", "BrightnessDown"), ("Brightness up", "BrightnessUp"),
+        ("Omarchy menu (Search key)", "Search"), ("Escape", "Esc"))]
+    + [{"label": f"Workspace {n}", "key": ["LeftMeta", f"Num{n}"], "group": "Workspaces"} for n in range(1, 10)]
+    + [{"label": f"F{n}", "key": f"F{n}", "group": "Function keys"} for n in range(1, 13)]
+)
+
+
+def omarchy_shortcuts():
+    """The user's Hyprland binds that a Touch Bar button can send, with their descriptions."""
+    out, seen = [], set()
+    for b in hypr_binds():
+        desc, key = str(b.get("description") or ""), str(b.get("key") or "")
+        if not desc or not key or desc.startswith(("Touch Bar", "Omabar:")):
+            continue
+        name = HYPR_TO_KEY.get(key.upper())
+        mask = b.get("modmask", 0)
+        if not name or not isinstance(mask, int) or mask & ~(64 | 4 | 8 | 1):
+            continue
+        mods = [k for bit, k, _ in MOD_KEYS if mask & bit]
+        combo = " + ".join([h for bit, _, h in MOD_KEYS if mask & bit] + [key.upper()])
+        if combo in seen:
+            continue
+        seen.add(combo)
+        out.append({"label": desc, "combo": combo, "key": mods + [name] if mods else name})
+    return sorted(out, key=lambda x: x["label"].lower())
+
+
+def desktop_apps():
+    """Installed apps (desktop entries) the app picker can launch."""
+    found = {}
+    dirs = [os.path.join(HOME, ".local/share/applications"), "/usr/share/applications"]
+    for d in dirs:
+        try:
+            names = sorted(os.listdir(d))
+        except OSError:
+            continue
+        for f in names:
+            if not f.endswith(".desktop") or f in found:
+                continue
+            entry, section = {}, False
+            try:
+                with open(os.path.join(d, f), encoding="utf-8", errors="replace") as fh:
+                    for line in fh:
+                        line = line.strip()
+                        if line.startswith("["):
+                            section = line == "[Desktop Entry]"
+                        elif section and "=" in line:
+                            k, v = line.split("=", 1)
+                            entry.setdefault(k, v)
+            except OSError:
+                continue
+            found[f] = entry
+    out = []
+    for f, e in found.items():
+        if e.get("Type", "Application") != "Application" or e.get("NoDisplay") == "true" or e.get("Hidden") == "true":
+            continue
+        if not e.get("Name") or not re.fullmatch(r"[A-Za-z0-9._+-]+\.desktop", f):
+            continue
+        out.append({"id": f, "name": e["Name"], "command": f"uwsm-app -- {f}"})
+    return sorted(out, key=lambda a: a["name"].lower())
+
+
+def used_keys(skip=None):
+    """hyprKey -> command for every saved layout except `skip`, plus fixed keys."""
+    used = {"code:194": WEATHER_TAP["command"], "XF86Search": "omarchy-menu toggle"}
+    for lid in layout_ids():
+        if lid == skip:
+            continue
+        try:
+            L = read_layout(lid)
+        except (OSError, ValueError):
+            continue
+        for b in rows(L):
+            if isinstance(b, dict) and b.get("hyprKey") and b.get("command"):
+                used.setdefault(b["hyprKey"], b["command"])
+    return used
+
+
+def assign_keys(L, lid=None):
+    """Give every button that has a command but no key a spare key. A command
+    already bound somewhere keeps its key, so the same app or script never
+    gets two binds."""
+    used = used_keys(skip=lid)
+    by_command = {cmd: k for k, cmd in used.items()}
+    own = {}
+    for b in rows(L):
+        if isinstance(b, dict) and b.get("hyprKey") and b.get("command"):
+            own.setdefault(b["hyprKey"], b["command"])
+    for b in rows(L):
+        if not isinstance(b, dict) or not b.get("command"):
+            continue
+        cmd = b["command"]
+        if b.get("hyprKey") and used.get(b["hyprKey"], cmd) == cmd and own.get(b["hyprKey"]) == cmd:
+            continue  # already has a key of its own
+        if cmd in by_command:
+            hk = by_command[cmd]
+            key = next((k for k, h in SPARE_KEYS if h == hk), None)
+            if key is None and hk == WEATHER_TAP["hyprKey"]:
+                key = WEATHER_TAP["key"]
+            if key is not None:
+                b["key"], b["hyprKey"] = key, hk
+                continue
+        taken = set(used) | set(own)
+        for key, hk in SPARE_KEYS:
+            if hk not in taken:
+                b["key"], b["hyprKey"] = key, hk
+                own[hk] = cmd
+                by_command[cmd] = hk
+                break
+        else:
+            fail("No spare keys left for another command button.")
+    return L
+
+
+def read_stdin_json(limit=MAX_LAYOUT_BYTES):
+    data = sys.stdin.read(limit + 1)
+    if len(data) > limit:
+        fail("input too large")
+    try:
+        return json.loads(data)
+    except ValueError as e:
+        fail(f"not valid JSON: {e}")
+
+
+def available_icons():
+    names = set()
+    for d in (ICON_SOURCES, USER_ICONS):
+        try:
+            names.update(f[:-4] for f in os.listdir(d) if f.endswith(".svg"))
+        except OSError:
+            pass
+    out = []
+    for n in sorted(names):
+        try:
+            with open(icon_source(n), encoding="utf-8") as f:
+                svg = f.read(65536)
+        except (OSError, TypeError):
+            continue
+        vb = re.search(r'viewBox="([-0-9. ]+)"', svg)
+        # The editor draws icons as vector shapes in any colour, so it needs
+        # the raw path data rather than a file.
+        out.append({"name": n, "viewBox": [float(v) for v in (vb.group(1) if vb else "0 -960 960 960").split()],
+                    "paths": re.findall(r'<path[^>]*\sd="([^"]+)"', svg)})
+    return out
+
+
+def cmd_editor_data():
+    rules = load_rules()
+    layouts = []
+    for lid, (path, source) in layout_paths().items():
+        try:
+            layouts.append({"id": lid, "source": source, "builtin": os.path.isfile(
+                os.path.join(BUILTIN_LAYOUTS, lid + ".json")), "layout": read_layout(lid)})
+        except (OSError, ValueError) as e:
+            layouts.append({"id": lid, "source": source, "error": str(e)})
+    try:
+        clients = json.loads(subprocess.run(["hyprctl", "clients", "-j"], capture_output=True,
+                                            text=True, timeout=3).stdout or "[]")
+        running = sorted({c.get("class") for c in clients if c.get("class")})
+    except (OSError, subprocess.SubprocessError, ValueError):
+        running = []
+    print(json.dumps({
+        "layouts": layouts,
+        "icons": available_icons(),
+        "palette": palette(),
+        "roles": list(ROLES),
+        "keys": KEY_PRESETS,
+        "shortcuts": omarchy_shortcuts(),
+        "apps": desktop_apps(),
+        "rules": {k: rules.get(k) for k in ("default", "rules", "follow", "emptyDefault", "shortcut")},
+        "shortcutDefault": DEFAULT_SHORTCUT,
+        "runningApps": running,
+        "userLayoutsDir": USER_LAYOUTS,
+    }, ensure_ascii=False))
+
+
+def clean_layout(L):
+    if not isinstance(L, dict):
+        fail("layout must be a JSON object")
+    L = {k: v for k, v in L.items() if k in ("name", "description", "mediaLayerDefault", "showButtonOutlines",
+                                             "adaptiveBrightness", "fontTemplate", "weatherUnit",
+                                             "buttons", "fnLayer")}
+    for row in ("buttons", "fnLayer"):
+        L[row] = [b for b in (L.get(row) or []) if isinstance(b, dict)]
+    return L
+
+
+def cmd_save(lid):
+    if not re.fullmatch(r"[a-z0-9][a-z0-9._-]{0,47}", lid):
+        fail("Layout ids use lowercase letters, digits, dots, dashes and underscores (up to 48).")
+    L = assign_keys(clean_layout(read_stdin_json()), lid)
+    errs = validate(expand(L, None))
+    if errs:
+        fail("Can't save: " + "; ".join(errs))
+    was_live = read_live() is not None and lid in layout_ids() and \
+        body(expand(read_layout(lid), load_weather())) == read_live()
+    atomic_write(os.path.join(USER_LAYOUTS, lid + ".json"), json.dumps(L, indent=2, ensure_ascii=False) + "\n")
+    if helper_ok():
+        hypr_binds.cache_clear()
+        sync_binds()
+        if was_live:
+            cmd_apply(lid)
+    print(json.dumps({"id": lid, "layout": L}, ensure_ascii=False))
+
+
+def cmd_delete(lid):
+    p = os.path.join(USER_LAYOUTS, lid + ".json")
+    if not os.path.isfile(p):
+        fail(f"{lid!r} isn't one of your layouts (built-in layouts can't be deleted).")
+    os.unlink(p)
+    if helper_ok():
+        sync_binds()
+
+
+def cmd_try():
+    L = assign_keys(clean_layout(read_stdin_json()))
+    L = expand(L, load_weather())
+    errs = validate(L)
+    if errs:
+        fail("Can't try this layout: " + "; ".join(errs))
+    atomic_write(TRIAL, str(time.time() + 30) + "\n")
+    sync_icons(extra=[L])
+    run_helper(["config", "--live"], render(L).encode("utf-8"))
+
+
+def cmd_restore():
+    try:
+        os.unlink(TRIAL)
+    except OSError:
+        pass
+    live = read_live()
+    if live is not None and helper_ok():
+        sync_icons()
+        run_helper(["config", "--live"], render(live).encode("utf-8"))
+
+
+def cmd_save_rules():
+    new = read_stdin_json()
+    if not isinstance(new, dict):
+        fail("rules must be a JSON object")
+    rules = load_rules()
+    if rules.get("error"):
+        rules = dict(DEFAULT_RULES)
+    ids = set(layout_ids())
+    if "rules" in new:
+        clean = []
+        for i, r in enumerate(new["rules"] or [], 1):
+            app, lay = str(r.get("app", "")).strip(), r.get("layout")
+            if not app:
+                continue
+            try:
+                re.compile(app)
+            except re.error as e:
+                fail(f"Rule {i}: the app pattern isn't valid ({e})")
+            if lay not in ids:
+                fail(f"Rule {i}: no layout named {lay!r}")
+            clean.append({"app": app, "layout": lay})
+        rules["rules"] = clean
+    if "default" in new:
+        if new["default"] not in ids:
+            fail(f"No layout named {new['default']!r}")
+        rules["default"] = new["default"]
+    if "shortcut" in new:
+        sc = str(new["shortcut"] or "").strip()
+        if sc and not HYPR_KEY.match(sc):
+            fail("The shortcut must look like SUPER + ALT + T")
+        rules["shortcut"] = sc
+    save_rules(rules)
+    if helper_ok() and "shortcut" in new:
+        sync_binds()
+
+
+MUTATING = {"apply", "auto", "refresh-weather", "retheme", "colors", "follow", "empty-default", "migrate",
+            "save", "delete", "try", "restore", "save-rules"}
 
 if __name__ == "__main__":
     args = sys.argv[1:]
@@ -974,6 +1340,18 @@ if __name__ == "__main__":
         if errs:
             fail("\n".join(errs))
         print(render(L), end="")
+    elif args == ["editor-data"]:
+        cmd_editor_data()
+    elif len(args) == 2 and args[0] == "save":
+        cmd_save(args[1])
+    elif len(args) == 2 and args[0] == "delete":
+        cmd_delete(args[1])
+    elif args == ["try"]:
+        cmd_try()
+    elif args == ["restore"]:
+        cmd_restore()
+    elif args == ["save-rules"]:
+        cmd_save_rules()
     elif args == ["doctor"]:
         cmd_doctor()
     elif args == ["migrate"]:

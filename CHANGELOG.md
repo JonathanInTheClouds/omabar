@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.2.0
+
+- **Layout editor** (Edit… in the popup): drag-and-drop button order, icon picker with live colour preview, colour swatches, widths, clocks, battery, weather and gaps, both rows. Saving a built-in keeps your own copy; Reset to built-in brings it back; New copy… duplicates.
+- **Action picker:** send one of your Omarchy shortcuts (read from Hyprland), open an installed app, press a media/system/workspace key, or run any command. Omabar assigns a free spare key and writes the bind.
+- **Try on Touch Bar:** puts the draft on the real bar for 20 seconds, then rolls back. Follow mode and weather pause meanwhile.
+- **Rules editor:** add rules from running apps, reorder, pick layouts, set the default and the shortcut.
+- **Shortcut:** SUPER + ALT + T opens Omabar (skipped if that combination is taken).
+- Tests can't reach the real helper (`OMABAR_HELPER`), plus new editor tests (58 total).
+
 ## 0.1.0 (2026-10-04)
 
 First release.

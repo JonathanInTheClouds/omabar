@@ -6,6 +6,8 @@ Omabar puts 17 ready-made layouts on your Touch Bar, shows each one as a to-scal
 
 - **17 layouts:** Duotone, Duotone Weather, Quiet, Keycaps, Workspaces, Capture, Windows, Desk Clock, Studio, Meeting, Dev, Themes, Quick Settings, Clipboard, Presenter, Browser and Numpad.
 - **Live preview:** every layout drawn at your Touch Bar's real size, with its Fn row.
+- **Layout editor:** drag buttons to reorder them, pick icons and colours, and choose what each button does from your Omarchy shortcuts, your installed apps, media keys or any command. Try a draft on the real Touch Bar for 20 seconds before saving. Edit the per-app rules too.
+- **Shortcut:** SUPER + ALT + T opens Omabar (change it, or turn it off, in the editor's Rules tab).
 - **Follow the focused app:** a terminal gets Dev, the browser gets Browser, Spotify gets Studio. Unmatched apps and empty desktops go back to the layout you picked yourself.
 - **Weather:** a condition icon and the temperature next to the clock, refreshed every 15 minutes. Tap it for the forecast.
 - **Colours:** Omabar's own green and ice look, or **match your Omarchy theme**. Theme colours update when you switch themes and are kept readable on the Touch Bar's black, light themes included.
@@ -55,7 +57,9 @@ sudo ~/.config/omarchy/plugins/io.github.jonathanintheclouds.omabar/system/insta
 
 ## Make it yours
 
-Your own layouts go in `~/.config/omarchy/omabar/layouts/`. To change a built-in one, copy it there under the same file name and edit the copy. Per-app rules and settings live in `~/.config/omarchy/omabar/rules.json`.
+The easiest way is the editor: open Omabar, pick a layout and press **Edit…**. Saving a built-in layout keeps your version alongside it, and **Reset to built-in** brings the original back.
+
+Your layouts are plain JSON files in `~/.config/omarchy/omabar/layouts/` (a file with a built-in layout's name replaces that layout), and your own icons can go in `~/.config/omarchy/omabar/icons/`. Per-app rules and settings live in `~/.config/omarchy/omabar/rules.json`.
 
 The easiest way to customise Omabar is to point an AI assistant at **[AGENTS.md](AGENTS.md)**. It documents the layout format, every button type, icons, keys and how the pieces fit together, so the assistant can make changes safely.
 

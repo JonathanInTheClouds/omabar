@@ -13,6 +13,8 @@ no() { printf 'FAIL  %s\n' "$1"; fail=$((fail + 1)); }
 t() { if eval "$2"; then ok "$1"; else no "$1"; fi; }
 
 export HOME=$SB
+# Never let a test reach the real root helper (and through it, the real Touch Bar).
+export OMABAR_HELPER=$SB/no-helper
 mkdir -p "$SB/.local/state/omarchy/current/theme" "$SB/.config/hypr" "$SB/.config/omarchy/omabar"
 printf -- '-- your binds\n' > "$SB/.config/hypr/bindings.lua"
 themes=$(ls -d /usr/share/omarchy/themes/* 2>/dev/null)
@@ -51,6 +53,18 @@ m.sync_binds(); a = open(m.BINDINGS).read(); t = os.stat(m.BINDINGS).st_mtime_ns
 m.sync_binds()
 assert a.startswith("-- your binds") and a.count(m.BIND_BEGIN) == 1 and os.stat(m.BINDINGS).st_mtime_ns == t
 EOF
+
+# Editor commands: key assignment, rules validation, try without a helper
+out=$(echo '{"name":"T","buttons":[{"icon":"terminal","tint":"accent","command":"omarchy-launch-terminal"},{"text":"x","command":"echo omabar-test"}]}' | "$O" save t-one 2>&1)
+t "save reuses the key of a known command" "echo '$out' | grep -q '\"hyprKey\": \"code:191\"'"
+t "save gives a new command a spare key" "echo '$out' | python3 -c 'import json,sys; b=json.load(sys.stdin)[\"layout\"][\"buttons\"][1]; sys.exit(0 if b[\"hyprKey\"] and b[\"key\"] else 1)'"
+t "save rejects bad ids" "! echo '{}' | '$O' save 'Bad Id' 2>/dev/null"
+t "save rejects path-like icons" "! echo '{\"buttons\":[{\"icon\":\"../x\",\"key\":\"F1\"}]}' | '$O' save t-bad 2>/dev/null"
+t "rules reject broken patterns" "! echo '{\"rules\":[{\"app\":\"(\",\"layout\":\"dev\"}]}' | '$O' save-rules 2>/dev/null"
+t "rules reject unknown layouts" "! echo '{\"rules\":[{\"app\":\"x\",\"layout\":\"nope\"}]}' | '$O' save-rules 2>/dev/null"
+t "try fails safely without a helper" "! echo '{\"buttons\":[{\"text\":\"F1\",\"key\":\"F1\"}]}' | '$O' try 2>/dev/null"
+t "built-in layouts can't be deleted" "! '$O' delete dev 2>/dev/null"
+t "your layouts can be deleted" "'$O' delete t-one"
 
 # Helper: scratch copy writing to $SB/etc, no root check, no systemctl
 H=$SB/helper

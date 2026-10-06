@@ -279,6 +279,14 @@ Panel {
     }
   }
 
+  // The editor is this plugin's panel entry point (Editor.qml); summoning the
+  // plugin id opens it. The popup closes so the editor has the screen.
+  function openEditor(payload) {
+    root.close()
+    Quickshell.execDetached(["omarchy-shell", "shell", "summon", "io.github.jonathanintheclouds.omabar",
+                             JSON.stringify(payload || {})])
+  }
+
   function setFollow(on) {
     if (followProc.running) return
     root.follow = on
@@ -442,6 +450,20 @@ Panel {
                 wrapMode: Text.Wrap
               }
               Text {
+                text: "Edit rules…"
+                color: Color.accent
+                font.family: root.bar.fontFamily
+                font.pixelSize: Style.font.caption
+                font.underline: rulesLink.containsMouse
+                MouseArea {
+                  id: rulesLink
+                  anchors.fill: parent
+                  hoverEnabled: true
+                  cursorShape: Qt.PointingHandCursor
+                  onClicked: root.openEditor({ tab: "rules" })
+                }
+              }
+              Text {
                 visible: root.ruleWarnings.length > 0
                 text: "Rules file: " + root.ruleWarnings.join("; ")
                 color: Color.urgent
@@ -579,6 +601,19 @@ Panel {
                 return { value: l.id, label: l.name + (l.source === "yours" ? "  (yours)" : "") + (l.active ? "  (active)" : "") }
               })
               onChanged: function (v) { root.selectedId = v; root.error = "" }
+            }
+
+            Button {
+              id: editButton
+              anchors.left: picker.right
+              anchors.leftMargin: Style.space(10)
+              anchors.verticalCenter: parent.verticalCenter
+              text: "Edit…"
+              fontSize: Style.font.bodySmall
+              foreground: root.bar.foreground
+              fontFamily: root.bar.fontFamily
+              bordered: true
+              onClicked: root.openEditor({ layout: root.selectedId })
             }
 
             Item {
