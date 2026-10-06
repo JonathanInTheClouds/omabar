@@ -65,6 +65,10 @@ t "rules reject unknown layouts" "! echo '{\"rules\":[{\"app\":\"x\",\"layout\":
 t "try fails safely without a helper" "! echo '{\"buttons\":[{\"text\":\"F1\",\"key\":\"F1\"}]}' | '$O' try 2>/dev/null"
 t "built-in layouts can't be deleted" "! '$O' delete dev 2>/dev/null"
 t "your layouts can be deleted" "'$O' delete t-one"
+t "an empty main row is refused" "! echo '{\"buttons\":[]}' | '$O' save t-empty 2>/dev/null"
+echo '{"name":"NoFn","buttons":[{"text":"A","key":"F1"}],"fnLayer":[]}' | "$O" save t-nofn >/dev/null 2>&1
+t "an empty Fn row gets F-keys instead of crashing tiny-dfr" "'$O' render t-nofn | sed -n '/PrimaryLayerKeys/,/^]/p' | grep -q 'Text = \"F12\"'"
+"$O" delete t-nofn >/dev/null 2>&1
 
 # Helper: scratch copy writing to $SB/etc, no root check, no systemctl
 H=$SB/helper

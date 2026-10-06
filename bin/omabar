@@ -417,6 +417,8 @@ def validate(L):
             continue
         if len(items) > 24:
             errs.append(f"{row} has {len(items)} buttons; tiny-dfr breaks above about 24")
+        if row == "buttons" and not items:
+            errs.append("the main row needs at least one button")
         for i, b in enumerate(items, 1):
             where = f"{row}[{i}]"
             if not isinstance(b, dict):
@@ -471,6 +473,9 @@ def render(L):
     def layer(name, items):
         return f"{name} = [\n" + ",\n".join(render_button(b) for b in items) + "\n]\n"
 
+    # tiny-dfr panics on a layer with no buttons ("layer has 0 buttons"), which
+    # leaves the bar on its crash screen. An empty Fn row gets plain F-keys.
+    fn = L.get("fnLayer") or [{"text": f"F{i}", "key": f"F{i}"} for i in range(1, 13)]
     return (f"{MARKER}\n"
             f"MediaLayerDefault = {flag('mediaLayerDefault', True)}\n"
             f"ShowButtonOutlines = {flag('showButtonOutlines', True)}\n"
@@ -478,7 +483,7 @@ def render(L):
             f"FontTemplate = {toml_str(L.get('fontTemplate', ':bold'))}\n"
             f"AdaptiveBrightness = {flag('adaptiveBrightness', True)}\n"
             "ActiveBrightness = 128\n\n"
-            + layer("PrimaryLayerKeys", L.get("fnLayer") or [])
+            + layer("PrimaryLayerKeys", fn)
             + "\n" + layer("MediaLayerKeys", L.get("buttons") or []))
 
 
@@ -599,6 +604,34 @@ def sync_binds():
 # ---------- root helper ----------
 def helper_ok():
     return os.path.isfile(HELPER) and os.access(HELPER, os.X_OK)
+
+
+def tiny_dfr_crashed():
+    """True if the running tiny-dfr has panicked. After a panic it stays alive
+    on a "tiny-dfr crashed" screen and no longer reloads its config."""
+    try:
+        pid = subprocess.run(["systemctl", "show", "tiny-dfr.service", "-p", "MainPID", "--value"],
+                             capture_output=True, text=True, timeout=5).stdout.strip()
+        if not pid.isdigit() or pid == "0":
+            return False
+        r = subprocess.run(["journalctl", f"_PID={pid}", "-o", "cat", "--no-pager"],
+                           capture_output=True, text=True, timeout=5)
+        return "panicked at" in r.stdout
+    except (OSError, subprocess.SubprocessError):
+        return False
+
+
+def push_config(text):
+    """Hand a config to tiny-dfr in place, or restart it with the config if it
+    has crashed (before or because of this write)."""
+    data = text.encode("utf-8")
+    if tiny_dfr_crashed():
+        run_helper(["config"], data)  # replaces the file and restarts tiny-dfr
+        return
+    run_helper(["config", "--live"], data)
+    time.sleep(0.4)
+    if tiny_dfr_crashed():
+        run_helper(["config"], data)
 
 
 def run_helper(args, data):
@@ -850,7 +883,7 @@ def cmd_apply(lid, wx=None):
         fail(f"Layout {lid!r} has problems: " + "; ".join(errs))
     sync_icons()
     sync_binds()
-    run_helper(["config", "--live"], render(L).encode("utf-8"))
+    push_config(render(L))
     # live.json is what "active" is judged by, so it only changes once the bar
     # really has the new layout; a failed switch is retried next time.
     atomic_write(LIVE, json.dumps(L, indent=2, ensure_ascii=False) + "\n")
@@ -922,7 +955,7 @@ def cmd_retheme():
         live = read_live()
         if live is not None:
             # tiny-dfr only reloads icons along with its config; rewrite it as-is.
-            run_helper(["config", "--live"], render(live).encode("utf-8"))
+            push_config(render(live))
 
 
 def cmd_colors(mode):
@@ -956,6 +989,7 @@ def cmd_doctor():
     check(en == "enabled", "tiny-dfr enabled", "run system/install.sh")
     act = subprocess.run(["systemctl", "is-active", "tiny-dfr"], capture_output=True, text=True).stdout.strip()
     check(act == "active", f"tiny-dfr running ({act})", "sudo systemctl restart tiny-dfr")
+    check(not tiny_dfr_crashed(), "tiny-dfr isn't stuck on its crash screen", "activate any layout (Omabar restarts it)")
     check(hw["displayFound"], "Touch Bar display driver (appletbdrm) bound", "reboot once after install.sh")
     check(helper_ok(), "Omabar helper installed (passwordless switching)", "run system/install.sh")
     res = subprocess.run(["systemctl", "is-enabled", "omabar-resume.service"], capture_output=True, text=True).stdout.strip()
@@ -1262,7 +1296,7 @@ def cmd_try():
         fail("Can't try this layout: " + "; ".join(errs))
     atomic_write(TRIAL, str(time.time() + 30) + "\n")
     sync_icons(extra=[L])
-    run_helper(["config", "--live"], render(L).encode("utf-8"))
+    push_config(render(L))
 
 
 def cmd_restore():
@@ -1273,7 +1307,7 @@ def cmd_restore():
     live = read_live()
     if live is not None and helper_ok():
         sync_icons()
-        run_helper(["config", "--live"], render(live).encode("utf-8"))
+        push_config(render(live))
 
 
 def cmd_save_rules():

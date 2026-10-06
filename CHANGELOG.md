@@ -7,6 +7,7 @@
 - **Try on Touch Bar:** puts the draft on the real bar for 20 seconds, then rolls back. Follow mode and weather pause meanwhile.
 - **Rules editor:** add rules from running apps, reorder, pick layouts, set the default and the shortcut.
 - **Shortcut:** SUPER + ALT + T opens Omabar (skipped if that combination is taken).
+- Fixed: an empty row crashed tiny-dfr ("layer has 0 buttons") and left the Touch Bar on its crash screen. The main row now needs at least one button, an empty Fn row gets F1–F12, and Omabar restarts tiny-dfr whenever it finds it crashed. `doctor` checks for it.
 - Tests can't reach the real helper (`OMABAR_HELPER`), plus new editor tests (58 total).
 
 ## 0.1.0 (2026-10-04)
